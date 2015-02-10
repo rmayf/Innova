@@ -15,7 +15,7 @@ exports.Player = function( name ) {
 
    this.removeCard = function( cardName ) {
       if( this.hand === [] ){
-         throw new types.InvalidMove( 'Can\'t remove card from empty hand' );; 
+         throw new types.InvalidMove( 'Can\'t remove card from empty hand' );
       }
       var index = 0;
       for( ; index < this.hand.length; index++ ) {
