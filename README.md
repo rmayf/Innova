@@ -8,7 +8,7 @@ Tests are written using [Mocha] and the test suite can be ran with `npm test`.
    Main file defining objects for maintaining game state.  
 
 - cards.js:
-   I wrote a simple parser to generate this from [a innovation card list].
+   I wrote a simple parser to generate this from [the innovation card list].
    Callback functions are used to represent dogma effects of each card.
 
 - types.js:
@@ -20,5 +20,5 @@ Tests are written using [Mocha] and the test suite can be ran with `npm test`.
 
 
 
-[a innovation card list]: http://innovation.boardgamestrategy.net/innovation-card-list/
+[the innovation card list]: http://innovation.boardgamestrategy.net/innovation-card-list/
 [Mocha]: http://mochajs.org/
