@@ -1,15 +1,3 @@
-exports.Card = function( name, age, color, topL, botL, botM, botR, dogmaSymbol, dogmas ) {
-   this.name = name;
-   this.age = age;
-   this.color = color;
-   this.symbols = { topL: topL,
-                    botL: botL,
-                    botM: botM,
-                    botR: botR };
-   this.dogmaSymbol = dogmaSymbol;
-   this.dogmas = dogmas;
-   this.toString = function() { return this.symbols };
-};
 exports.InvalidMove = function( msg ) {
    this.name = "InvalidMove";
    this.message = msg;

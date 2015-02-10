@@ -110,7 +110,10 @@ exports.Game = function( playerNames, numAchievements ) {
    this.numAchievements = numAchievements;
    this.agePiles = [];
    for( var i = 0; i < 10; i++ ) {
-      this.agePiles[ i ] = cards.agePiles[ i ]();
+      this.agePiles[ i ] = [];
+      for( var j = 0; j < cards.agePiles[ i ].length; j++ ) {
+         this.agePiles[ i ][ j ] = cards.agePiles[ i ][ j ];
+      }
       shuffle( this.agePiles[ i ] );
    }
 
