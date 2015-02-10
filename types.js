@@ -6,7 +6,11 @@ exports.InvalidMove = function( msg ) {
 exports.VictoryCondition = function( players, msg ) {
    this.name = "VictoryCondition";
    this.players = players;
-   this.message = msg;
+   this.message = players[ 0 ].name;
+   for( var i = 1; i < players.length; i++ ) {
+      this.message += ', ' + players[ i ].name;
+   }
+   this.message += ': ' + msg;
 };
 
 exports.Reaction = function( n, list, callback ) {

@@ -158,7 +158,7 @@ exports.Game = function( playerNames, numAchievements ) {
                }
             }
          }
-         throw new types.VictoryCondition( highest.players );
+         throw new types.VictoryCondition( highest.players, 'won from drawing above age 10' );
       }
 
       return this.agePiles[ attemptAge - 1 ].pop();
@@ -211,7 +211,10 @@ exports.Game = function( playerNames, numAchievements ) {
             break;
          case 'Achieve':
             var age = cardName;
-            if( this.achievements[ age ] === null ) {
+            if( age < 1 || age > 10 ) {
+               throw new Error( 'can\'t achieve age ' + age + ', doesn\'t exist' );
+            }
+            if( this.achievements[ age - 1 ] === null ) {
                throw new types.InvalidMove( age + ' has already been achieved' );
             }
             if( player.getScore() < age * 5 ) {
@@ -220,10 +223,10 @@ exports.Game = function( playerNames, numAchievements ) {
             if( player.highestTopCard() < age ) {
                throw new types.InvalidMove( player + ' doesn\'t have a top card at least age ' + age );
             }
-            player.achievements.push( this.achievements[ age ] );
-            this.achievements[ age ] = null;
+            player.achievements.push( this.achievements[ age - 1 ] );
+            this.achievements[ age - 1 ] = null;
             if( player.achievements.length >= this.numAchievements ) {
-               throw new types.VictorCondition( player, 'reached ' + numAchievements + ' achievements!' );
+               throw new types.VictoryCondition( [ player ], 'reached ' + numAchievements + ' achievements!' );
             }
             break;
          case 'Dogma':
