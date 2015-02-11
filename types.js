@@ -25,8 +25,8 @@ exports.Green = 2;
 exports.Purple = 3;
 exports.Blue = 4;
 
-exports.Leaf = 0;
-exports.Hex = 1;
+exports.Hex = 0;
+exports.Leaf = 1;
 exports.Factory = 2;
 exports.Crown = 3;
 exports.Clock = 4;

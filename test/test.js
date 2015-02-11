@@ -159,13 +159,13 @@ describe( 'Basic Gameplay', function() {
       expect( player1.board[ types.Purple ].cards[ 0 ].name ).to.equal( 'Monotheism' );
       game.action( player1.name, 'Meld', 'Canal Building' );
       game.action( player1.name, 'Meld', 'Road Building' );
-      expect( player1.getSymbolCount() ).to.eql( [ 1, 3, 0, 2, 0, 0, 6 ] );
+      expect( player1.getSymbolCount() ).to.eql( [ 3, 1, 0, 2, 0, 0, 6 ] );
       player1.board[ types.Purple ].splay = types.Left;
-      expect( player1.getSymbolCount() ).to.eql( [ 1, 3, 0, 2, 0, 1, 6 ] );
+      expect( player1.getSymbolCount() ).to.eql( [ 3, 1, 0, 2, 0, 1, 6 ] );
       player1.board[ types.Purple ].splay = types.Right;
-      expect( player1.getSymbolCount() ).to.eql( [ 1, 4, 0, 2, 0, 1, 6 ] );
+      expect( player1.getSymbolCount() ).to.eql( [ 4, 1, 0, 2, 0, 1, 6 ] );
       player1.board[ types.Purple ].splay = types.Up;
-      expect( player1.getSymbolCount() ).to.eql( [ 1, 3, 0, 2, 0, 3, 6 ] );
+      expect( player1.getSymbolCount() ).to.eql( [ 3, 1, 0, 2, 0, 3, 6 ] );
    } )
    it( 'Achieving', function() {
       player1.actions = 1;
@@ -186,5 +186,48 @@ describe( 'Basic Gameplay', function() {
       player1.hand.push( card );
       player1.meld( card.name );
       expect( function() { game.action( player1.name, 'Achieve', 2 ); } ).to.throw( types.VictoryCondition, player1.name );
+   } )
+   describe( 'Special Achievements', function() {
+      beforeEach( function() {
+         // put all cards into player1's hand
+         for( var i = 0; i < 10; i++ ) {
+            var numCards = game.agePiles[ i ].length
+            for( var j = 0; j < numCards; j++ ) {
+               player1.hand.push( game.agePiles[ i ].pop() );
+            }
+         }
+         for( var i = 0; i < 9; i++ ) {
+            player1.hand.push( game.achievements.pop() );
+         }
+         player1.hand.push( player2.hand.pop() );
+         player1.hand.push( player2.hand.pop() );
+      } )
+      it( 'Empire', function() {
+         game.checkSpecial( player1 );
+         expect( player1.achievements ).to.be.empyty;
+         player1.meld( 'Agriculture' );
+         player1.meld( 'Mysticism' );
+         player1.meld( 'Philosophy' );
+         player1.meld( 'Translation' );
+         player1.meld( 'Explosives' );
+         player1.meld( 'Satellites' );
+         for( var i = 0; i < player1.board.length; i++ ) {
+            player1.board[ i ].splay = types.Up;
+         }
+         game.checkSpecial( player1 );
+         expect( player1.achievements ).to.not.be.empty;
+         game.checkSpecial( player1 );
+      } )
+      it( 'World', function() {
+         player1.meld( 'Rocketry' );
+         player1.meld( 'Fission' );
+         player1.meld( 'Satellites' );
+         player1.meld( 'Databases' );
+         game.checkSpecial( player1 ); 
+         expect( player1.achievements ).to.be.empty;
+         player1.board[ types.Green ].splay = types.Up;
+         game.checkSpecial( player1 ); 
+         expect( player1.achievements ).to.not.be.empty;
+      } )
    } )
 } )

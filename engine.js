@@ -294,9 +294,10 @@ exports.Game = function( playerNames, numAchievements ) {
       return this.players[ i + 1 ];
    };
    this.checkSpecial = function( player ) {
+      var game = this;
       var doAchieve = function( achievement ) {
-         player.achievements.push( this.specialAchievements[ achievement ] );
-         this.specialAchievements[ achievement ] = null;
+         player.achievements.push( game.specialAchievements[ achievement ] );
+         game.specialAchievements[ achievement ] = null;
       };
       if( this.specialAchievements[ types.Monument ] !== null ) {
          if( player.numTucked >= 6 || player.numScored >= 6 ) {
@@ -306,7 +307,8 @@ exports.Game = function( playerNames, numAchievements ) {
       var symbolCount = player.getSymbolCount();
       if( this.specialAchievements[ types.Empire ] !== null ) {
          var all = true;
-         for( var i = 0; i < symbolCount.length; i++ ) {
+         // start at i = 1 to skip counting Hex symbols
+         for( var i = 1; i < symbolCount.length; i++ ) {
             if( symbolCount[ i ] < 3 ) {
                all = false;
                break;
@@ -316,6 +318,7 @@ exports.Game = function( playerNames, numAchievements ) {
             doAchieve( types.Empire ); 
          }
       }
+      console.log( symbolCount );
       if( this.specialAchievements[ types.World ] !== null ) {
          if( symbolCount[ types.Clock ] >= 12 ) {
             doAchieve( types.World );
