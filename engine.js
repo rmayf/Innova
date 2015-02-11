@@ -1,5 +1,5 @@
 var types = require( './types' );
-var cards = require( './card' );
+var cards = require( './cards' );
 var http = require( 'http' );
 
 exports.Player = function( name ) {
@@ -124,7 +124,7 @@ exports.Game = function( playerNames, numAchievements ) {
 
    this.specialAchievements = [];
    this.specialAchievements[ types.Monument ] = { name: 'Monument' };
-   this.specialAchievements[ types.Empire ] = { name: 'Emipre' };
+   this.specialAchievements[ types.Empire ] = { name: 'Empire' };
    this.specialAchievements[ types.World ] = { name: 'World' };
    this.specialAchievements[ types.Wonder ] = { name: 'Wonder' };
    this.specialAchievements[ types.Universe ] = { name: 'Universe' };
