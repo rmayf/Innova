@@ -2,7 +2,7 @@ var types = require( './types' );
 var cards = require( './cards' );
 var http = require( 'http' );
 
-exports.Player = function( name ) {
+var Player = function( name ) {
    this.name = name;
    this.scoreCards = [];
    this.hand = [];
@@ -105,7 +105,7 @@ exports.Game = function( playerNames, numAchievements ) {
    }
    this.players = [];
    for( var i = 0; i < playerNames.length; i++ ) {
-      this.players.push( new exports.Player( playerNames[ i ] ) ); 
+      this.players.push( new Player( playerNames[ i ] ) ); 
    }
    this.numAchievements = numAchievements;
    this.agePiles = [];
