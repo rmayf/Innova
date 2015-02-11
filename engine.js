@@ -1,5 +1,5 @@
 var types = require( './types' );
-var cards = require( './card' );
+var cards = require( './cards' );
 var http = require( 'http' );
 
 exports.Player = function( name ) {
