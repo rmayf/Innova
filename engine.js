@@ -13,6 +13,13 @@ var Player = function( name ) {
    this.numTucked = 0;
    this.numScored = 0;
 
+   this.score = function( card ) {
+      if( !card ) {
+         throw new Error( 'no card specified to ' + this.name + '.score' );
+      }
+      this.scoreCards.push( card );
+      this.numScored++;
+   };
    this.removeCard = function( cardName ) {
       if( this.hand === [] ){
          throw new types.InvalidMove( 'Can\'t remove card from empty hand' );
@@ -165,6 +172,7 @@ exports.Game = function( playerNames, numAchievements ) {
    }
    for( var i = 0; i < this.players.length; i++ ) {
       this.players[ i ].hand.push( this.agePiles[ 0 ].pop() );
+      this.players[ i ].hand.push( this.agePiles[ 0 ].pop() );
    }
    var playerReady = [];
    var numPlayers = this.players.length;
@@ -183,11 +191,13 @@ exports.Game = function( playerNames, numAchievements ) {
                      }
                 };
       };
-      player.hand.push( this.agePiles[ 0 ].pop() );   
       player.reaction = new types.Reaction( 1, this.players[ i ].hand, callback( this.players[ i ] ) );
    }
    this.reaction = function( playerName, entity ) {
       var player = this.lookupPlayer( playerName );
+      if( player.reaction == null ) {
+         throw new Error( playerName + ' has no reaction' );
+      }
       var callback = player.reaction.callback;
       player.reaction = null;
       callback( entity );
@@ -196,6 +206,9 @@ exports.Game = function( playerNames, numAchievements ) {
       var player = this.lookupPlayer( playerName );
       if( player.actions <= 0 ) {
          throw new Error( player.name + ' has no actions' );
+      }
+      if( player.reaction != null ) {
+         throw new Error( player.name + ' has outstanding reaction' );
       }
       switch( action ) {
          case 'Draw':
@@ -253,16 +266,17 @@ exports.Game = function( playerNames, numAchievements ) {
                }
             }
             var game = this;
-            for( var i = 0; i < card.dogmas.length; i++ ) {
-               var dogma = card.dogmas[ i ];
+            var dogmas = card.dogmas();
+            for( var i = 0; i < dogmas.length; i++ ) {
+               var dogma = dogmas[ i ];
                if( dogma.demand ) {
                   for( var j = 0; j < demandPlayers; j++ ) {
-                     dogma( game, player, demandPlayers[ j ] );
+                     dogma.execute( game, player, demandPlayers[ j ] );
                      this.checkSpecialAll(); 
                   }
                } else {
                   for( var j = 0; j < sharedPlayers.length; j++ ) {
-                     dogma( game, sharedPlayers[ j ] );
+                     dogma.execute( game, sharedPlayers[ j ] );
                      this.checkSpecialAll();
                   }
                }
@@ -318,7 +332,6 @@ exports.Game = function( playerNames, numAchievements ) {
             doAchieve( types.Empire ); 
          }
       }
-      console.log( symbolCount );
       if( this.specialAchievements[ types.World ] !== null ) {
          if( symbolCount[ types.Clock ] >= 12 ) {
             doAchieve( types.World );
@@ -327,7 +340,7 @@ exports.Game = function( playerNames, numAchievements ) {
       if( this.specialAchievements[ types.Wonder ] !== null ) {
          var fiveStacks = true;
          for( var i = 0; i < player.board.length; i++ ) {
-            if( player.board[ i ].cards.length === 0 ) {
+            if( player.board[ i ].cards.length < 2 ) { // Need at least two cards in a stack for splay to take effect
                fiveStacks = false;
             }
          }
@@ -362,8 +375,8 @@ exports.Game = function( playerNames, numAchievements ) {
             }
          }
       }
-      if( player.achievements.length > this.numAchievements ) {
-         throw new VictoryCondition( player, 'Special achievements' );
+      if( player.achievements.length >= this.numAchievements ) {
+         throw new types.VictoryCondition( [ player ], 'Special achievements' );
       }
    };
    this.checkSpecialAll = function() {

@@ -9,24 +9,30 @@ var Card = function( name, age, color, topL, botL, botM, botR, dogmaSymbol, dogm
                     botR: botR };
    this.dogmaSymbol = dogmaSymbol;
    this.dogmas = dogmas;
-   this.toString = function() { return this.symbols };
+   this.toString = function() { return this.name };
 };
+
+var AgricultureDogmas = function() {
+   // setup state needed in effect functions
+   return [ { demand: false,
+              execute: function( game, player ) {
+                           if( player.hand.length == 0 ) {
+                              return;
+                           }
+                           player.reaction = new types.Reaction( 1, player.hand.concat( [ null ] ),
+                                                               function( card ) {
+                                                                  if( card != null ) {
+                                                                     player.removeCard( card.name );
+                                                                     game.agePiles[ card.age - 1 ].unshift( card );
+                                                                     player.score( game.drawCard( card.age + 1 ) );
+                                                                  }
+                                                                  return card == null; } ) } } ] };
 
 exports.agePiles = [
    [
-      new Card( "Agriculture", 1, types.Yellow, types.Hex, types.Leaf, types.Leaf, types.Leaf, types.Leaf, [ function( game, player ) {
-         if( player.hand.length === 0 ) {
-            return;
-         }
-         player.chooseOne( player.hand.concat( [ null ] ),
-                                 function( card ) {
-                                    if( card ) {
-                                       player.removeCard( card );
-                                       game.agePiles[ card.age ].push( card );
-                                       player.score.append[ game.drawCard( card.age + 1 ) ];
-                                    }
-                                 } );
-      } ] ),
+      new Card( "Agriculture", 1, types.Yellow, types.Hex, types.Leaf,
+                types.Leaf, types.Leaf, types.Leaf, AgricultureDogmas ),
+
       new Card( "Archery", 1, types.Red, types.Castle, types.Lightbulb, types.Hex, types.Castle, types.Castle, [  function() {} ] ) ,
       new Card( "City States", 1, types.Purple, types.Hex, types.Crown, types.Crown, types.Castle, types.Crown, [  function() {} ] ) ,
       new Card( "Clothing", 1, types.Green, types.Hex, types.Crown, types.Leaf, types.Leaf, types.Leaf, [  function() {} ] ) ,
