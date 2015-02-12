@@ -14,7 +14,7 @@ var Player = function( name ) {
    this.numScored = 0;
 
    this.score = function( card ) {
-      if( !card ) {
+      if( card == null ) {
          throw new Error( 'no card specified to ' + this.name + '.score' );
       }
       this.scoreCards.push( card );
