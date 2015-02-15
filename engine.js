@@ -214,6 +214,7 @@ exports.Game = function( playerNames, numAchievements ) {
       var callback = player.reaction.callback;
       player.reaction = null;
       callback( entity );
+      this.checkSpecialAll();
    };
    this.action = function( playerName, action, cardName ) {
       var player = this.lookupPlayer( playerName );

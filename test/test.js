@@ -222,6 +222,35 @@ describe( 'Player', function() {
             player1.hand.push( player2.hand.pop() );
             player1.hand.push( player2.hand.pop() );
          } )
+         describe( 'Monument', function() {
+            it( 'by tucking 6', function() {
+               player1.meld( 'Code of Laws' ); 
+               var col = cards[ 'Code of Laws' ];
+               dogma = col.dogmas()[ 0 ].execute;
+               for( var i = 0; i < 6; i++ ) {
+                  dogma( game, player1 );
+                  game.reaction( player1.name, player1.reaction.list[ 0 ].name );
+                  game.reaction( player1.name, true );
+               }
+               expect( player1.achievements[ 0 ].name ).to.equal( 'Monument' );
+            } )
+            it( 'by scoring 6', function() {
+               for( var i = 0; i < player1.hand.length; i++ ) {
+                  if( player1.hand[ i ].age == 10 ) {
+                     game.agePiles[ 9 ].push( player1.hand.splice( i, 1 ) );
+                     i--;
+                  }
+               }
+               player1.meld( 'Agriculture' );
+               var ag = cards[ 'Agriculture' ];
+               dogma = ag.dogmas()[ 0 ].execute;
+               for( var i = 0; i < 6; i++ ) {
+                  dogma( game, player1 );
+                  game.reaction( player1.name, player1.reaction.list[ 0 ].name );
+               }
+               expect( player1.achievements[ 0 ].name ).to.equal( 'Monument' );
+            } )
+         } )
          it( 'Empire', function() {
             game.checkSpecial( player1 );
             expect( player1.achievements ).to.be.empyty;
