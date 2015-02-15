@@ -1,6 +1,7 @@
 #!/usr/local/bin/node
 var engine = require( '../engine' );
 var types = require( '../types' );
+var cards = require( '../cards' ).Cards;
 var expect = require( 'chai' ).expect;
 
 var game;
@@ -114,7 +115,17 @@ describe( 'Player', function() {
       player1.reaction = null;
       player2.reaction = null;
    } )
-   describe( 'should be able to', function() {
+   describe( 'can', function() {
+      it( 'tuck', function() {
+        player1.hand.push( cards[ 'Calendar' ] );
+        player1.meld( 'Calendar' );
+        player1.tuck( cards[ 'Mathematics' ] );
+        expect( player1.board[ types.Blue ].cards[ 0 ].name ).to.equal( 'Calendar' );
+        expect( player1.board[ types.Blue ].cards[ 1 ].name ).to.equal( 'Mathematics' );
+        expect( player1.numTucked ).to.equal( 1 );
+        player1.tuck( cards[ 'Canal Building' ] );
+        expect( player1.board[ types.Yellow ].cards[ 0 ].name ).to.equal( 'Canal Building' );
+      } )
       it( 'meld', function() {
          player1.actions = 1;
          expect( player1.hand ).to.have.length( 2 );
@@ -337,7 +348,7 @@ describe( 'Card', function() {
          var card = game.agePiles[ 2 ].pop();
          player1.hand.push( card );
          dogma( game, player1 );
-         game.reaction( player1.name, card );
+         game.reaction( player1.name, card.name );
          expect( player1.scoreCards[ 0 ].age ).to.equal( 4 );
          expect( player1.getScore() ).to.equal( 4 );
          expect( player1.hand ).to.be.empty;
@@ -348,10 +359,10 @@ describe( 'Card', function() {
          var age9Card = game.agePiles[ 8 ].pop();
          player1.hand.splice( 0, 0, age2Card, age9Card );
          dogma( game, player1 );
-         game.reaction( player1.name, age9Card );
+         game.reaction( player1.name, age9Card.name);
          expect( player1.getScore() ).to.equal( 10 );
          dogma( game, player1 );
-         game.reaction( player1.name, age2Card );
+         game.reaction( player1.name, age2Card.name );
          expect( player1.getScore() ).to.equal( 10 + 3 );
       } )
       it( 'allows player to decline', function() {
@@ -359,6 +370,43 @@ describe( 'Card', function() {
          dogma( game, player1 );
          game.reaction( player1.name, null );
          expect( player1.getScore() ).to.equal( 0 );
+      } )
+   } )
+   describe( 'Code of Laws', function() {
+      var dogma;
+      beforeEach( function() {
+         var card = cards[ 'Code of Laws' ];
+         dogma = card.dogmas()[ 0 ].execute;
+         var calendar = cards[ 'Calendar' ];
+         player1.hand.push( calendar );
+         player1.meld( calendar.name );
+         player1.hand = [];
+      } )
+      it( 'returns correct list of cards', function() {
+         var writing = cards[ 'Writing' ];
+         player1.hand.push( writing );
+         dogma( game, player1 );
+         expect( player1.reaction.list ).to.have.length( 2 );
+         expect( player1.reaction.list ).to.contain( writing );
+      } )
+      it( 'allows player to tuck', function() {
+         var tools = cards[ 'Tools' ];
+         player1.hand.push( tools );
+         player1.hand.push( cards[ 'Writing' ] );
+         dogma( game, player1 );
+         game.reaction( player1.name, tools.name );
+         expect( player1.board[ types.Blue ].cards[ 1 ] ).to.equal( tools );
+         expect( player1.reaction ).to.not.be.null;
+      } )
+      it( 'allows player to splay', function() {
+         var tools = cards[ 'Tools' ];
+         player1.hand.push( tools );
+         player1.hand.push( cards[ 'Writing' ] );
+         dogma( game, player1 );
+         game.reaction( player1.name, tools.name );
+         expect( player1.board[ types.Blue ].splay ).to.equal( types.None ); 
+         game.reaction( player1.name, true );
+         expect( player1.board[ types.Blue ].splay ).to.equal( types.Left ); 
       } )
    } )
 } )

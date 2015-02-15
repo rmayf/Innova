@@ -20,7 +20,7 @@ var Player = function( name ) {
       this.scoreCards.push( card );
       this.numScored++;
    };
-   this.removeCard = function( cardName ) {
+   this.removeFromHand = function( cardName ) {
       if( this.hand === [] ){
          throw new types.InvalidMove( 'Can\'t remove card from empty hand' );
       }
@@ -37,8 +37,8 @@ var Player = function( name ) {
       return ar[ 0 ];
    };
    this.meld = function( cardName ) {
-      var card = this.removeCard( cardName );
-      this.board[ card.color ].cards.splice( 0, 0, card );
+      var card = this.removeFromHand( cardName );
+      this.board[ card.color ].cards.unshift( card );
    };
    this.highestTopCard = function() {
       var age = 0;
@@ -96,6 +96,10 @@ var Player = function( name ) {
       }
       return score;
    };
+   this.tuck = function( card ) {
+      this.board[ card.color ].cards.push( card );
+      this.numTucked++;
+   };
 }
 
 function Stack() {
@@ -116,12 +120,21 @@ exports.Game = function( playerNames, numAchievements ) {
    }
    this.numAchievements = numAchievements;
    this.agePiles = [];
-   for( var i = 0; i < 10; i++ ) {
-      this.agePiles[ i ] = [];
-      for( var j = 0; j < cards.agePiles[ i ].length; j++ ) {
-         this.agePiles[ i ][ j ] = cards.agePiles[ i ][ j ];
-      }
-      shuffle( this.agePiles[ i ] );
+   var age = 0;
+   var i = 0;
+   var length = 15;
+   for( card in cards.Cards ) {
+      if( i == 0 ) {
+         this.agePiles[ age ] = [];
+      } 
+      this.agePiles[ age ][ i ] = cards.Cards[ card ];
+      i++;
+      if( i == length ) {
+         shuffle( this.agePiles[ age ] );
+         length = 10;
+         i = 0;
+         age++;
+      } 
    }
 
    this.achievements = [];
