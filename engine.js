@@ -6,7 +6,7 @@ var Player = function( name ) {
    this.name = name;
    this.scoreCards = [];
    this.hand = [];
-   this.board = [ new Stack(), new Stack(), new Stack(), new Stack(), new Stack() ];
+   this.board = new Board();
    this.achievements = [];
    this.reaction = null;
    this.actions = 0;
@@ -74,7 +74,7 @@ var Player = function( name ) {
          }
       };
       var table = [ 0, 0, 0, 0, 0, 0, 0 ];
-      for( var i = 0; i < this.board.length; i++ ) {
+      for( var i = 0; i < 5; i++ ) {
          if( this.board[ i ].cards.length === 0 ) {
             continue;
          }
@@ -105,6 +105,45 @@ var Player = function( name ) {
 function Stack() {
    this.splay = types.None;
    this.cards = [];
+}
+
+function Board() {
+   this[ types.Yellow ] =  new Stack(),
+   this[ types.Red ] = new Stack(),
+   this[ types.Green ] = new Stack(),
+   this[ types.Purple ] = new Stack(),
+   this[ types.Blue ] = new Stack(),
+
+   // Same functionality as array
+   this.indexOf = function( card ) {
+      var accum = 0;
+      for( var i = 0; i < 5; i++ ) {
+         for( var j = 0, len = this[ i ].cards.length; j < len; j++ ) {
+            if( this[ i ].cards[ j ] == card ) {
+               return accum;
+            }
+            accum++;
+         }
+      } 
+   },
+   this.splice = function( idx, n ) {
+      if( n != 1 ) {
+         throw new Error( 'splice not properly implemented for Board' );
+      }
+      var spliced = true;
+      for( var i = 0; i < 5; i++ ) {
+         if( idx >=  this[ i ].cards.length ) {
+            idx -= this[ i ].cards.length;
+         } else {
+            this[ i ].cards.splice( idx, 1 );
+            spliced = false;
+            break;
+         }
+      }
+      if( spliced ) {
+         throw new Error( 'card not found in board splice' );
+      }
+   }
 }
 
 exports.Game = function( playerNames, numAchievements ) {
