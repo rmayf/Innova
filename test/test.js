@@ -88,8 +88,9 @@ describe( 'Game', function() {
       } )
       it( 'transitions to next player', function() {
          player1.actions = 1;
+         game.turn = 1;
          game.action( player1.name, 'Draw' );
-         expect( game.turn ).to.equal( 1 );
+         expect( game.turn ).to.equal( 2 );
          expect( game.players[ 1 ].actions ).to.equal( 2 );
       } )
       it( 'keeps track of the game turn', function() {
@@ -102,7 +103,7 @@ describe( 'Game', function() {
       it( 'works with 4 players', function() {
          game.players.push( 'hehe' );
          game.players.push( 'haha' );
-         game.turn = 0;
+         game.turn = 1;
          player1.actions = 1;
          game.action( player1.name, 'Draw' );
          expect( player2.actions ).to.equal( 1 );
@@ -117,13 +118,12 @@ describe( 'Player', function() {
    } )
    describe( 'can', function() {
       it( 'tuck', function() {
-        player1.hand.push( cards[ 'Calendar' ] );
-        player1.meld( 'Calendar' );
-        player1.tuck( cards[ 'Mathematics' ] );
+        game.meld( player1, cards[ 'Calendar' ] );
+        game.tuck( player1, cards[ 'Mathematics' ] );
         expect( player1.board[ types.Blue ].cards[ 0 ].name ).to.equal( 'Calendar' );
         expect( player1.board[ types.Blue ].cards[ 1 ].name ).to.equal( 'Mathematics' );
         expect( player1.numTucked ).to.equal( 1 );
-        player1.tuck( cards[ 'Canal Building' ] );
+        game.tuck( player1, cards[ 'Canal Building' ] );
         expect( player1.board[ types.Yellow ].cards[ 0 ].name ).to.equal( 'Canal Building' );
       } )
       it( 'meld', function() {
@@ -157,13 +157,13 @@ describe( 'Player', function() {
          expect( player1.board[ types.Purple ].cards[ 0 ].name ).to.equal( 'Monotheism' );
          game.action( player1.name, 'Meld', 'Canal Building' );
          game.action( player1.name, 'Meld', 'Road Building' );
-         expect( player1.getSymbolCount() ).to.eql( [ 3, 1, 0, 2, 0, 0, 6 ] );
+         expect( player1.symbolCount() ).to.eql( [ 3, 1, 0, 2, 0, 0, 6 ] );
          player1.board[ types.Purple ].splay = types.Left;
-         expect( player1.getSymbolCount() ).to.eql( [ 3, 1, 0, 2, 0, 1, 6 ] );
+         expect( player1.symbolCount() ).to.eql( [ 3, 1, 0, 2, 0, 1, 6 ] );
          player1.board[ types.Purple ].splay = types.Right;
-         expect( player1.getSymbolCount() ).to.eql( [ 4, 1, 0, 2, 0, 1, 6 ] );
+         expect( player1.symbolCount() ).to.eql( [ 4, 1, 0, 2, 0, 1, 6 ] );
          player1.board[ types.Purple ].splay = types.Up;
-         expect( player1.getSymbolCount() ).to.eql( [ 3, 1, 0, 2, 0, 3, 6 ] );
+         expect( player1.symbolCount() ).to.eql( [ 3, 1, 0, 2, 0, 3, 6 ] );
       } )
       it( 'achieve', function() {
          player1.actions = 1;
@@ -171,7 +171,7 @@ describe( 'Player', function() {
          expect( function() { game.action( player1.name, 'Achieve', 1 ); } ).to.throw( types.InvalidMove, 'enough' );
          player1.scoreCards.push( game.agePiles[ 4 ].pop() );
          expect( function() { game.action( player1.name, 'Achieve', 1 ); } ).to.throw( types.InvalidMove, 'top card' );
-         player1.meld( player1.hand[ 0 ].name );
+         game.meld( player1, player1.hand[ 0 ] );
          game.action( player1.name, 'Achieve', 1 );
          expect( player1.achievements ).to.have.length( 1 );
          expect( player1.actions ).to.equal( 0 );
@@ -182,7 +182,7 @@ describe( 'Player', function() {
          game.numAchievements = 2;
          var card = game.agePiles[ 1 ].pop();
          player1.hand.push( card );
-         player1.meld( card.name );
+         game.meld( player1, card );
          expect( function() { game.action( player1.name, 'Achieve', 2 ); } ).to.throw( types.VictoryCondition, player1.name );
       } )
       it( 'draw', function() {
@@ -196,17 +196,42 @@ describe( 'Player', function() {
          expect( game.agePiles[ 0 ] ).to.have.length( pileNum - 1 );
          expect( player1.actions ).to.equal( 0 );
          game.agePiles[ 0 ] = [];
-         var age2 = game.drawCard( 1 );
+         var age2 = game.drawReturn( 1 );
          expect( age2.age ).to.equal( 2 );
-         player1.board[ 0 ].cards.push( game.drawCard( 4 ) );
+         player1.board[ 0 ].cards.push( game.drawReturn( 4 ) );
          player1.actions = 1;
          player1.hand = [];
          game.action( player1.name, 'Draw' );
          expect( player1.hand[ 0 ].age ).to.equal( 4 );
-         expect( function() { game.drawCard( 11 ); } ).to.throw( types.VictoryCondition, 'bob, janice' )
+         expect( function() { game.drawReturn( 11 ); } ).to.throw( types.VictoryCondition, 'bob, janice' )
          player2.scoreCards.push( {age: 1 } );
-         expect( function() { game.drawCard( 11 ); } ).to.throw( types.VictoryCondition, 'janice' )
+         expect( function() { game.drawReturn( 11 ); } ).to.throw( types.VictoryCondition, 'janice' )
          player2.scoreCards = [];
+      } )
+      it( 'dogma', function() {
+         player1.reaction = null;
+         player2.reaction = null;
+         player1.actions = 1;
+         game.turn = 1;
+         player1.hand = [];
+         dom = cards[ 'Domestication' ];
+         ag = cards[ 'Agriculture' ];
+         player1.hand.push( cards[ 'Archery' ] );
+         game.meld( player1, dom );
+         game.meld( player1, ag );
+         expect( function() { game.action( player1.name, 'Dogma', 'Oars' ) } ).to.throw( types.InvalidMove );
+         expect( function() { game.action( player1.name, 'Dogma', 'Domestication' ) } ).to.throw( types.InvalidMove );
+         game.action( player1.name, 'Dogma', 'Agriculture' );
+         expect( player1.reaction ).to.not.be.null;
+         expect( player2.reaction ).to.be.null;
+         expect( player1.perform ).to.be.true;
+         expect( player1.reaction.n ).to.equal( 1 );
+         expect( player1.reaction.list ).to.contain( cards[ 'Archery' ] );
+         expect( game.turn ).to.equal( 1 );
+         game.reaction( player1.name, null );
+         expect( game.turn ).to.equal( 2 );
+         expect( player2.actions ).to.equal( 2 );
+         expect( player1.reaction ).to.be.null;
       } )
       describe( 'claim', function() {
          beforeEach( 'put all cards into player1\'s hand', function() {
@@ -224,13 +249,13 @@ describe( 'Player', function() {
          } )
          describe( 'Monument', function() {
             it( 'by tucking 6', function() {
-               player1.meld( 'Code of Laws' ); 
                var col = cards[ 'Code of Laws' ];
+               game.meld( player1, col ); 
                dogma = col.dogmas()[ 0 ].execute;
                for( var i = 0; i < 6; i++ ) {
                   dogma( game, player1 );
-                  game.reaction( player1.name, player1.reaction.list[ 0 ].name );
-                  game.reaction( player1.name, true );
+                  player1.reaction.callback( player1.reaction.list[ 0 ].name );
+                  player1.reaction.callback( true );
                }
                expect( player1.achievements[ 0 ].name ).to.equal( 'Monument' );
             } )
@@ -241,100 +266,91 @@ describe( 'Player', function() {
                      i--;
                   }
                }
-               player1.meld( 'Agriculture' );
+               game.turn = 1;
                var ag = cards[ 'Agriculture' ];
+               game.meld( player1, ag );
                dogma = ag.dogmas()[ 0 ].execute;
                for( var i = 0; i < 6; i++ ) {
                   dogma( game, player1 );
-                  game.reaction( player1.name, player1.reaction.list[ 0 ].name );
+                  player1.reaction.callback( player1.reaction.list[ 0 ].name );
                }
                expect( player1.achievements[ 0 ].name ).to.equal( 'Monument' );
             } )
          } )
          it( 'Empire', function() {
-            game.checkSpecial( player1 );
+            // player1 can play
             expect( player1.achievements ).to.be.empyty;
-            player1.meld( 'Agriculture' );
-            player1.meld( 'Mysticism' );
-            player1.meld( 'Philosophy' );
-            player1.meld( 'Translation' );
-            player1.meld( 'Explosives' );
-            player1.meld( 'Satellites' );
-            for( var i = 0; i < player1.board.length; i++ ) {
-               player1.board[ i ].splay = types.Up;
+            game.meld( player1, cards[ 'Agriculture' ] );
+            game.meld( player1, cards[ 'Mysticism' ] );
+            game.meld( player1, cards[ 'Philosophy' ] );
+            game.meld( player1, cards[ 'Translation' ] );
+            game.meld( player1, cards[ 'Explosives' ] );
+            game.meld( player1, cards[ 'Satellites' ] );
+            for( var i = 0; i < 5; i++ ) {
+               game.splay( player1, i, types.Up );
             }
-            game.checkSpecial( player1 );
             expect( player1.achievements ).to.not.be.empty;
-            game.checkSpecial( player1 );
          } )
          it( 'World', function() {
-            player1.meld( 'Rocketry' );
-            player1.meld( 'Fission' );
-            player1.meld( 'Satellites' );
-            player1.meld( 'Databases' );
-            game.checkSpecial( player1 ); 
+            game.meld( player1, cards[ 'Rocketry' ] );
+            game.meld( player1, cards[ 'Fission' ] );
+            game.meld( player1, cards[ 'Satellites' ] );
+            game.meld( player1, cards[ 'Databases' ] );
             expect( player1.achievements ).to.be.empty;
-            player1.board[ types.Green ].splay = types.Up;
-            game.checkSpecial( player1 ); 
+            game.splay( player1, types.Green, types.Up );
             expect( player1.achievements ).to.not.be.empty;
          } )
          it( 'Wonder', function() {
             // Yellow
-            player1.meld( 'Agriculture' );
-            player1.meld( 'Domestication' );
-            player1.board[ types.Yellow ].splay = types.Up;
+            game.meld( player1, cards[ 'Agriculture' ] );
+            game.meld( player1, cards[ 'Domestication' ] );
+            game.splay( player1, types.Yellow, types.Up );
 
             // Blue
-            player1.meld( 'Pottery' );
-            player1.meld( 'Tools' );
-            player1.board[ types.Blue ].splay = types.Right;
+            game.meld( player1, cards[ 'Pottery' ] );
+            game.meld( player1, cards[ 'Tools' ] );
+            game.splay( player1, types.Blue, types.Right );
 
             // Red
-            player1.meld( 'Archery' );
-            player1.meld( 'Oars' );
-            player1.board[ types.Red ].splay = types.Up;
+            game.meld( player1, cards[ 'Archery' ] );
+            game.meld( player1, cards[ 'Oars' ] );
+            game.splay( player1, types.Red, types.Up );
             
             // Purple
-            player1.meld( 'Mysticism' );
-            player1.meld( 'Code of Laws' );
-            player1.board[ types.Purple ].splay = types.Up;
+            game.meld( player1, cards[ 'Mysticism' ] );
+            game.meld( player1, cards[ 'Code of Laws' ] );
+            game.splay( player1, types.Purple, types.Up );
 
-            game.checkSpecial( player1 );
             expect( player1.achievements ).to.be.empty;
 
-            player1.meld( 'Clothing' );
-            player1.board[ types.Green ].splay = types.Up;
-            game.checkSpecial( player1 );
+            game.meld( player1, cards[ 'Clothing' ] );
+            game.splay( player1, types.Green, types.Up );
             expect( player1.achievements ).to.be.empty;
 
-            player1.board[ types.Green].splay = types.Left;
-            player1.meld( 'Sailing' );
-            game.checkSpecial( player1 );
+            game.splay( player1, types.Green, types.Left );
+            game.meld( player1, cards[ 'Sailing' ] );
             expect( player1.achievements ).to.be.empty;
 
-            player1.board[ types.Green ].splay = types.Right;
-            game.checkSpecial( player1 );
+            game.splay( player1, types.Green, types.Right );
             expect( player1.achievements ).to.have.length( 1 );
          } )
          it( 'Universe', function() {
-            player1.meld( 'Robotics' );
-            player1.meld( 'Self Service' );
-            player1.meld( 'Software' );
-            player1.meld( 'Stem Cells' );
-            game.checkSpecial( player1 );
+            game.meld( player1, cards[ 'Robotics' ] );
+            game.meld( player1, cards[ 'Self Service' ] );
+            game.meld( player1, cards[ 'Software' ] );
+            game.meld( player1, cards[ 'Stem Cells' ] );
             expect( player1.achievements ).to.be.empty;
-            player1.meld( 'The Internet' );
-            game.checkSpecial( player1 );
+            game.meld( player1, cards[ 'The Internet' ] );
             expect( player1.achievements ).to.have.length( 1 );
          } )
          it( 'victory by Special Achievements', function() {
             game.numAchievements = 1;
-            player1.meld( 'Robotics' );
-            player1.meld( 'Self Service' );
-            player1.meld( 'Software' );
-            player1.meld( 'Stem Cells' );
-            player1.meld( 'The Internet' );
-            expect( function() { game.checkSpecial( player1 ); } ).to.throw( types.VictoryCondition, player1.name );
+            game.meld( player1, cards[ 'Robotics' ] );
+            game.meld( player1, cards[ 'Self Service' ] );
+            game.meld( player1, cards[ 'Software' ] );
+            game.meld( player1, cards[ 'Stem Cells' ] );
+            expect( function() { game.meld( player1, cards[ 'The Internet' ] ) } )
+                                 .to.throw( types.VictoryCondition, player1.name );
             expect( player1.achievements ).to.have.length( 1 );
          } )
       } )
@@ -344,21 +360,10 @@ describe( 'Card', function() {
    describe( 'Agriculture', function() {
       var dogma;
       beforeEach( 'player1 melds agriculture', function() {
-         for( var i = 0; i < 2; i++ ) {
-            game.agePiles[ 0 ].push( player1.hand.pop() );
-            game.agePiles[ 0 ].push( player2.hand.pop() );
-         }
-         for( var i = 0; i < game.agePiles[ 0 ].length; i++ ) {
-            if( game.agePiles[ 0 ][ i ].name == 'Agriculture' ) {
-               player1.hand = player1.hand.concat( game.agePiles[ 0 ].splice( i, 1 ) );
-               break;
-            }
-         }
-         if( player1.hand.length != 1 ) {
-            player1.hand.push( game.achievements.shift() );
-         }
-         player1.meld( 'Agriculture' );
-         dogma = player1.board[ types.Yellow ].cards[ 0 ].dogmas()[ 0 ].execute; 
+         var ag = cards[ 'Agriculture' ];
+         game.meld( player1, ag );
+         dogma = ag.dogmas()[ 0 ].execute; 
+         player1.hand = [];
       } )
       it( 'has no effect when nothing in hand', function() {
          dogma( game, player1 );
@@ -377,9 +382,9 @@ describe( 'Card', function() {
          var card = game.agePiles[ 2 ].pop();
          player1.hand.push( card );
          dogma( game, player1 );
-         game.reaction( player1.name, card.name );
+         player1.reaction.callback( card.name );
          expect( player1.scoreCards[ 0 ].age ).to.equal( 4 );
-         expect( player1.getScore() ).to.equal( 4 );
+         expect( player1.score() ).to.equal( 4 );
          expect( player1.hand ).to.be.empty;
          expect( game.agePiles[ 2 ][ 0 ] ).to.be.eql( card );
       } )
@@ -389,16 +394,13 @@ describe( 'Card', function() {
          player1.hand.splice( 0, 0, age2Card, age9Card );
          dogma( game, player1 );
          game.reaction( player1.name, age9Card.name);
-         expect( player1.getScore() ).to.equal( 10 );
-         dogma( game, player1 );
-         game.reaction( player1.name, age2Card.name );
-         expect( player1.getScore() ).to.equal( 10 + 3 );
+         expect( player1.score() ).to.equal( 10 );
       } )
       it( 'allows player to decline', function() {
          player1.hand.push( game.agePiles[ 0 ].pop() );
          dogma( game, player1 );
          game.reaction( player1.name, null );
-         expect( player1.getScore() ).to.equal( 0 );
+         expect( player1.score() ).to.equal( 0 );
       } )
    } )
    describe( 'Code of Laws', function() {
@@ -407,8 +409,7 @@ describe( 'Card', function() {
          var card = cards[ 'Code of Laws' ];
          dogma = card.dogmas()[ 0 ].execute;
          var calendar = cards[ 'Calendar' ];
-         player1.hand.push( calendar );
-         player1.meld( calendar.name );
+         game.meld( player1, calendar );
          player1.hand = [];
       } )
       it( 'returns correct list of cards', function() {
