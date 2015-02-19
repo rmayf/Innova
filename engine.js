@@ -158,15 +158,20 @@ exports.Game = function( playerNames, numAchievements ) {
       this.players.push( new Player( playerNames[ i ] ) ); 
    }
    this.numAchievements = numAchievements;
+   this.sharingDraw = false;
+   this.mainPlayer = null;
+   this.dogmas = [];
+   this.demandPlayers = [];
+   this.sharedPlayers = [];
    this.agePiles = [];
    var age = 0;
    var i = 0;
    var length = 15;
-   for( card in cards.Cards ) {
+   for( card in cards ) {
       if( i == 0 ) {
          this.agePiles[ age ] = [];
       } 
-      this.agePiles[ age ][ i ] = cards.Cards[ card ];
+      this.agePiles[ age ][ i ] = cards[ card ];
       i++;
       if( i == length ) {
          shuffle( this.agePiles[ age ] );
@@ -230,30 +235,99 @@ exports.Game = function( playerNames, numAchievements ) {
    var numPlayers = this.players.length;
    for( var i = 0; i < this.players.length; i++ ) {
       var player = this.players[ i ];
-      var callback = function( player ) {
-         return function( cardName ) {
-                     player.meld( cardName );
+      var callback = ( function( player ) {
+         return ( function( cardName ) {
+                     var card = cards[ cardName ];
+                     player.removeFromHand( card );
+                     this.meld( player, card );
                      playerReady.push( { cardName: cardName,
                                            player: player } );
-                     if( playerReady.length === numPlayers ) {
-                        playerReady.sort( function( a, b ) {
-                           return a.cardName.localeCompare( b.cardName ); 
-                        } );
-                        playerReady[ 0 ].player.actions = 1;
-                     }
-                };
-      };
+                     return playerReady;
+                } ).bind( this );
+      } ).bind( this );
       player.reaction = new types.Reaction( 1, this.players[ i ].hand, callback( this.players[ i ] ) );
+      player.perform = true;
    }
+   this.nextDogma = function() {
+      if( this.dogmas.length == 0 ) {
+         if( this.sharingDraw ) {
+            this.draw( this.mainPlayer );
+         }
+         this.mainPlayer.actions--;
+      } else {
+         var dogma = this.dogmas.shift();
+         var game = this;
+         if( dogma.demand ) {
+            for( var j = 0; j < this.demandPlayers; j++ ) {
+               var res = dogma.execute( game, player, this.demandPlayers[ j ] );
+               if( res ) {
+                  this.sharingDraw = true;
+               }
+            }
+         } else {
+            for( var j = 0; j < this.sharedPlayers.length; j++ ) {
+               var res = dogma.execute( game, this.sharedPlayers[ j ] );
+               if( res ) {
+                  this.sharingDraw = true;
+               }
+            }
+         }
+         var i = 0;
+         var player = this.nextPlayer( this.mainPlayer );
+         while( player.reaction == null && i < this.players.length ) {
+            player = this.nextPlayer( player ); 
+            i++;  
+         }
+         if( i == this.players.length ) {
+            this.nextDogma();
+         } else {
+            player.perform = true;
+         }
+      }
+   };
    this.reaction = function( playerName, entity ) {
       var player = this.lookupPlayer( playerName );
       if( player.reaction == null ) {
          throw new Error( playerName + ' has no reaction' );
       }
+      if( player.perform == false ) {
+         throw new Error( 'not ' + playerName + '\'s turn to perform' );
+      }
       var callback = player.reaction.callback;
       player.reaction = null;
-      callback( entity );
-      this.checkSpecialAll();
+      player.perform = false;
+      var shared = callback( entity );
+      if( shared === true ) {
+         this.sharingDraw = true;
+      }
+      var nextPlayer = player;
+      var lastReaction = true;
+      for( var i = 0; i < this.players.length; i++ ) {
+         if( this.players[ i ].reaction != null ) {
+            lastReaction = false;
+            break;
+         }
+      }
+      if( lastReaction ) {
+         if( this.turn == 0 ) {
+            var playerReady = shared;
+            playerReady.sort( function( a, b ) {
+               return a.cardName.localeCompare( b.cardName ); 
+            } );
+            playerReady[ 0 ].player.actions = 1;
+            this.turn++;
+         } else {
+            this.nextDogma();   
+            if( this.mainPlayer.actions == 0 ) {
+               this.endTurn( player );
+            }
+         }
+      } else {
+         while( nextPlayer.reaction == null ) {
+            nextPlayer = this.nextPlayer( nextPlayer );
+         }
+         nextPlayer.perform = true;
+      }
    };
    this.action = function( playerName, action, cardName ) {
       var player = this.lookupPlayer( playerName );
@@ -294,62 +368,55 @@ exports.Game = function( playerNames, numAchievements ) {
             if( player.achievements.length >= this.numAchievements ) {
                throw new types.VictoryCondition( [ player ], 'reached ' + numAchievements + ' achievements!' );
             }
+            player.actions--;
             break;
          case 'Dogma':
-            var card = player.getCardFromBoard( cardName );
-            if( card === null ) {
-               throw new InvalidMove( player, cardName + ' is not a top card' ); 
+            var card = cards[ cardName ];
+            var cardsColorPile = player.board[ card.color ].cards;
+            if( cardsColorPile.length == 0 || cardsColorPile[ 0 ] !== card ) {
+               throw new types.InvalidMove( player, cardName + ' is not a top card' ); 
             }
-            var playerCount = player.getSymbolCount()[ card.dogmaSymbol ];
-            var demandPlayers = [];
-            var sharedPlayers = [];
+            this.mainPlayer = player;
+            this.sharingDraw = false;
+            this.demandPlayers = [];
+            this.sharedPlayers = [];
+
+            var playerCount = player.symbolCount()[ card.dogmaSymbol ];
             var other = player;
             for( var i = 0; i < this.players.length; i++ ) {
                var other = this.nextPlayer( other );
                var otherCount = 0;
                if( player !== other ) {
-                  otherCount = other.getSymbolCount()[ card.dogmaSymbol ];
+                  otherCount = other.symbolCount()[ card.dogmaSymbol ];
                } else {
                   otherCount = playerCount;
                }
                if( playerCount > otherCount ) {
-                  demandPlayers.push( other );
+                  this.demandPlayers.push( other );
                } else {
-                  sharedPlayers.push( other );
+                  this.sharedPlayers.push( other );
                }
             }
-            var game = this;
-            var dogmas = card.dogmas();
-            for( var i = 0; i < dogmas.length; i++ ) {
-               var dogma = dogmas[ i ];
-               if( dogma.demand ) {
-                  for( var j = 0; j < demandPlayers; j++ ) {
-                     dogma.execute( game, player, demandPlayers[ j ] );
-                     this.checkSpecialAll(); 
-                  }
-               } else {
-                  for( var j = 0; j < sharedPlayers.length; j++ ) {
-                     dogma.execute( game, sharedPlayers[ j ] );
-                     this.checkSpecialAll();
-                  }
-               }
-            }
+            this.dogmas = card.dogmas();
+            this.nextDogma();
       } 
-      player.actions--;
-      if( player.actions === 0 ) {
-         for( var i = 0; i < this.players.length; i++ ) {
-            this.players[ i ].numTucked = 0;
-            this.players[ i ].numScored = 0; 
-         }
-         var nextPlayer = this.nextPlayer( player );
-         if( this.turn === 0 && this.players.length === 4 ) {
-            nextPlayer.actions = 1;
-         } else {
-            nextPlayer.actions = 2;
-         }
-         this.turn++;
+      if( player.actions == 0 ) {
+         this.endTurn( player );
       }
    }
+   this.endTurn = function( player ) {
+      for( var i = 0; i < this.players.length; i++ ) {
+         this.players[ i ].numTucked = 0;
+         this.players[ i ].numScored = 0; 
+      }
+      var nextPlayer = this.nextPlayer( player );
+      if( this.turn === 1 && this.players.length === 4 ) {
+         nextPlayer.actions = 1;
+      } else {
+         nextPlayer.actions = 2;
+      }
+      this.turn++;
+   };
    this.nextPlayer = function( player ) {
       var i = this.players.indexOf( player );
       if( i === -1 ){
