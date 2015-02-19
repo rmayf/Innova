@@ -1,6 +1,5 @@
 var types = require( './types' );
-var cards = require( './cards' );
-var http = require( 'http' );
+var cards = require( './cards' ).Cards;
 
 var Player = function( name ) {
    this.name = name;
@@ -9,40 +8,30 @@ var Player = function( name ) {
    this.board = new Board();
    this.achievements = [];
    this.reaction = null;
+   this.perform = false;
    this.actions = 0;
    this.numTucked = 0;
    this.numScored = 0;
 
-   this.score = function( card ) {
-      if( card == null ) {
-         throw new Error( 'no card specified to ' + this.name + '.score' );
-      }
-      this.scoreCards.push( card );
-      this.numScored++;
-   };
-   this.removeFromHand = function( cardName ) {
+   this.removeFromHand = function( card ) {
       if( this.hand === [] ){
          throw new types.InvalidMove( 'Can\'t remove card from empty hand' );
       }
       var index = 0;
       for( ; index < this.hand.length; index++ ) {
-         if( this.hand[ index ].name === cardName ) {
+         if( this.hand[ index ] === card ) {
             break;
          }
       }
       if( index === this.hand.length ) {
-         throw new types.InvalidMove( cardName + ' not in ' + this.name + '\'s hand' ); 
+         throw new types.InvalidMove( card.name + ' not in ' + this.name + '\'s hand' ); 
       }
       var ar = this.hand.splice( index, 1 );
       return ar[ 0 ];
    };
-   this.meld = function( cardName ) {
-      var card = this.removeFromHand( cardName );
-      this.board[ card.color ].cards.unshift( card );
-   };
    this.highestTopCard = function() {
       var age = 0;
-      for( var i = 0; i < this.board.length; i++ ) {
+      for( var i = 0; i < 5; i++ ) {
          if( this.board[ i ].cards.length > 0 ) {
             var cur = this.board[ i ].cards[ 0 ].age;
             if( cur > age ) {
@@ -52,15 +41,7 @@ var Player = function( name ) {
       }
       return age;
    };
-   this.getCardFromBoard = function( cardName ) {
-      for( var i = 0; i < this.board.length; i++ ) {
-         if( this.board[ i ][ 0 ].name === cardName ) {
-            return this.board[ i ][ 0 ];
-         }
-      }
-      return null;
-   };
-   this.getSymbolCount = function() {
+   this.symbolCount = function() {
       var splayHelper = function( table, splay, symbols ) {
          if( splay === types.Left ) {
             table[ symbols.botR ]++;
@@ -89,16 +70,12 @@ var Player = function( name ) {
       }
       return table;
    };
-   this.getScore = function() {
+   this.score = function() {
       var score = 0;
       for( var i = 0; i < this.scoreCards.length; i++ ) {
          score += this.scoreCards[ i ].age; 
       }
       return score;
-   };
-   this.tuck = function( card ) {
-      this.board[ card.color ].cards.push( card );
-      this.numTucked++;
    };
 }
 
@@ -193,7 +170,7 @@ exports.Game = function( playerNames, numAchievements ) {
    this.specialAchievements[ types.Wonder ] = { name: 'Wonder' };
    this.specialAchievements[ types.Universe ] = { name: 'Universe' };
    this.turn = 0;
-   this.drawCard = function( age ) {
+   this.drawReturn = function( age ) {
       var attemptAge = age;
       while( attemptAge <= 10 && this.agePiles[ attemptAge - 1 ].length === 0 ) {
          attemptAge++;
@@ -204,14 +181,14 @@ exports.Game = function( playerNames, numAchievements ) {
                          numAchievements: 0,
                          players: [] };
          var setHighest = function( player ) {
-            highest.score = player.getScore();
+            highest.score = player.score();
             highest.numAchievements = player.achievements.length;
             highest.players = [ player ];
          }
          setHighest( this.players[ 0 ] );
          for( var i = 1; i < this.players.length; i++ ) {
             var player = this.players[ i ];
-            var playerScore = player.getScore();
+            var playerScore = player.score();
             if( playerScore > highest.score ) {
                setHighest( player );
             } else if ( playerScore === highest.score ) {
@@ -224,8 +201,16 @@ exports.Game = function( playerNames, numAchievements ) {
          }
          throw new types.VictoryCondition( highest.players, 'won from drawing above age 10' );
       }
-
       return this.agePiles[ attemptAge - 1 ].pop();
+   };
+   this.draw = function( player, age ) {
+      if( !age ) {
+         age = player.highestTopCard();
+         if( age == 0 ) {
+            age = 1; 
+         }
+      }
+      player.hand.push( this.drawReturn( age ) );
    }
    for( var i = 0; i < this.players.length; i++ ) {
       this.players[ i ].hand.push( this.agePiles[ 0 ].pop() );
@@ -339,15 +324,14 @@ exports.Game = function( playerNames, numAchievements ) {
       }
       switch( action ) {
          case 'Draw':
-            var age = player.highestTopCard();
-            if( age == 0 ) {
-               age = 1; 
-            }
-            player.hand.push( this.drawCard( age ) );
+            this.draw( player );
+            player.actions--;
             break;
          case 'Meld':
-            player.meld( cardName );
-            this.checkSpecial( player );
+            var card = cards[ cardName ];
+            player.removeFromHand( card );
+            this.meld( player, card );
+            player.actions--;
             break;
          case 'Achieve':
             var age = cardName;
@@ -357,7 +341,7 @@ exports.Game = function( playerNames, numAchievements ) {
             if( this.achievements[ age - 1 ] === null ) {
                throw new types.InvalidMove( age + ' has already been achieved' );
             }
-            if( player.getScore() < age * 5 ) {
+            if( player.score() < age * 5 ) {
                throw new types.InvalidMove( player + ' doesn\'t have enough to achieve ' + age );
             }
             if( player.highestTopCard() < age ) {
@@ -427,81 +411,68 @@ exports.Game = function( playerNames, numAchievements ) {
       }
       return this.players[ i + 1 ];
    };
-   this.checkSpecial = function( player ) {
-      var game = this;
-      var doAchieve = function( achievement ) {
-         player.achievements.push( game.specialAchievements[ achievement ] );
-         game.specialAchievements[ achievement ] = null;
-      };
-      if( this.specialAchievements[ types.Monument ] !== null ) {
-         if( player.numTucked >= 6 || player.numScored >= 6 ) {
-            doAchieve( types.Monument );
-         }
-      }
-      var symbolCount = player.getSymbolCount();
-      if( this.specialAchievements[ types.Empire ] !== null ) {
-         var all = true;
-         // start at i = 1 to skip counting Hex symbols
-         for( var i = 1; i < symbolCount.length; i++ ) {
-            if( symbolCount[ i ] < 3 ) {
-               all = false;
-               break;
-            }
-         }
-         if( all ) {
-            doAchieve( types.Empire ); 
-         }
-      }
-      if( this.specialAchievements[ types.World ] !== null ) {
-         if( symbolCount[ types.Clock ] >= 12 ) {
-            doAchieve( types.World );
-         }
-      }
-      if( this.specialAchievements[ types.Wonder ] !== null ) {
-         var fiveStacks = true;
-         for( var i = 0; i < player.board.length; i++ ) {
-            if( player.board[ i ].cards.length < 2 ) { // Need at least two cards in a stack for splay to take effect
-               fiveStacks = false;
-            }
-         }
-         if( fiveStacks ) {
-            var i = 0;
-            for( ; i < 5; i++ ) {
-               if( player.board[ i ].splay !== types.Up && player.board[ i ].splay !== types.Right ) {
-                  break;
-               }
-            } 
-            if( i === 5 ) {
-               doAchieve( types.Wonder );
-            }
-         } 
-      }
-      if( this.specialAchievements[ types.Universe ] !== null ) {
-         var fiveStacks = true;
-         for( var i = 0; i < player.board.length; i++ ) {
-            if( player.board[ i ].cards.length === 0 ) {
-               fiveStacks = false;
-            }
-         }
-         if( fiveStacks ) {
-            var i = 0;
-            for( ; i < 5; i++ ) {
-               if( player.board[ i ].cards[ 0 ].age < 8 ) {
-                  break;
-               }
-            } 
-            if( i === 5 ) {
-               doAchieve( types.Universe );
-            }
-         }
+   this.doAchieve = function( player, achievement ) {
+      if( this.specialAchievements[ achievement ] != null ) {
+         player.achievements.push( this.specialAchievements[ achievement ] );
+         this.specialAchievements[ achievement ] = null;
       }
       if( player.achievements.length >= this.numAchievements ) {
          throw new types.VictoryCondition( [ player ], 'Special achievements' );
       }
    };
-   this.checkSpecialAll = function() {
-      for( var i = 0; i < this.players.length; i++ ) {
-         this.checkSpecial( this.players[ i ] );
+   this.checkWonder = function( player ) {
+      var fiveStacks = true;
+      for( var i = 0; i < 5; i++ ) {
+         if( player.board[ i ].cards.length < 2 ) { // Need at least two cards in a stack for splay to take effect
+            fiveStacks = false;
+         }
+      }
+      if( fiveStacks ) {
+         var i = 0;
+         for( ; i < 5; i++ ) {
+            if( player.board[ i ].splay !== types.Up && player.board[ i ].splay !== types.Right ) {
+               break;
+            }
+         } 
+         if( i === 5 ) {
+            this.doAchieve( player, types.Wonder );
+         }
+      } 
+   };
+   this.checkUniverse = function( player ) {
+      var fiveStacks = true;
+      for( var i = 0; i < 5; i++ ) {
+         if( player.board[ i ].cards.length === 0 ) {
+            fiveStacks = false;
+         }
+      }
+      if( fiveStacks ) {
+         var i = 0;
+         for( ; i < 5; i++ ) {
+            if( player.board[ i ].cards[ 0 ].age < 8 ) {
+               break;
+            }
+         } 
+         if( i === 5 ) {
+            this.doAchieve( player, types.Universe );
+         }
+      }
+   };
+   this.checkEmpireAndWorld = function( player ) {
+      var symbols = player.symbolCount();
+      var all = true;
+      // start at i = 1 to skip counting Hex symbols
+      for( var i = 1; i < symbols.length; i++ ) {
+         if( symbols[ i ] < 3 ) {
+            all = false;
+            break;
+         }
+      }
+      if( all ) {
+         this.doAchieve( player, types.Empire ); 
+      }
+      if( symbols[ types.Clock ] >= 12 ) {
+         this.doAchieve( player, types.World );
       }
    };
    this.lookupPlayer = function( playerName ) {
@@ -513,6 +484,63 @@ exports.Game = function( playerNames, numAchievements ) {
       }
       throw new Error( playerName + ' not found' );
    }
+   this.score = function( player, card ) {
+      player.scoreCards.push( card );
+      player.numScored++;
+      if( player.numScored >= 6 ) {
+        this.doAchieve( player, types.Monument ); 
+      }
+   };
+   this.tuck = function( player, card ) {
+      player.board[ card.color ].cards.push( card );
+      player.numTucked++;
+      if( player.numTucked >= 6 ) {
+         this.doAchieve( player, types.Monument );
+      }
+      this.checkUniverse( player );
+      this.checkEmpireAndWorld( player );
+   };
+   this.meld = function( player, card ) {
+      player.board[ card.color ].cards.unshift( card );
+      this.checkUniverse( player );
+      this.checkEmpireAndWorld( player );
+   };
+   this.splay = function( player, color, direction ) {
+      player.board[ color ].splay = direction;
+      this.checkEmpireAndWorld( player );
+      this.checkWonder( player );
+   };
+   this.exchange = function( fnA, lsA, fnB, lsB ) {
+      var split = function( fn, ls ) {
+         // removes elements for which fn( elem ) is true
+         // returns list of removed elements
+         matches = [];
+         for( var i = 0; i < ls.length; i++ ) {
+            if( fn( ls[ i ] ) ) {
+               matches.concat( ls.splice( i, 1 ) );
+               i--;
+            }
+         }
+         return matches;
+      }
+      matchesA = split( fnA, lsA );
+      lsA.concat( split( fnB, lsB ) );
+      lsB.concat( matchesA );
+   };
+   this.transfer = function( txPlayer, txCards, txSrc, rxPlayer, rxSrc ) {
+      for( var i = 0; i < txCards.length; i++ ) {
+         rxSrc.push( txCards[ i ] );
+      };
+      for( var i = 0, len = txCards.length; i < len; i++ ) {
+         idx = txSrc.indexOf( txCards[ i ] );
+         txSrc.splice( idx, 1 );
+      }
+      
+      this.checkEmpireAndWorld( rxPlayer );
+      this.checkEmpireAndWorld( txPlayer );
+      this.checkUniverse( rxPlayer );
+      this.checkUniverse( txPlayer );
+   };
 }
 
 function shuffle(array) {

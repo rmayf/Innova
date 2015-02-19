@@ -13,7 +13,6 @@ var Card = function( name, age, color, topL, botL, botM, botR, dogmaSymbol, dogm
 };
 
 var AgricultureDogmas = function() {
-   // setup state needed in effect functions
    return [ { demand: false,
               execute: function( game, player ) {
                            if( player.hand.length == 0 ) {
@@ -22,9 +21,11 @@ var AgricultureDogmas = function() {
                            player.reaction = new types.Reaction( 1, player.hand.concat( [ null ] ),
                                                                function( cardName ) {
                                                                   if( cardName != null ) {
-                                                                     var card = player.removeFromHand( cardName );
+                                                                     var card = cards[ cardName ];
+                                                                     player.removeFromHand( card );
                                                                      game.agePiles[ card.age - 1 ].unshift( card );
-                                                                     player.score( game.drawCard( card.age + 1 ) );
+                                                                     game.score( player,
+                                                                                 game.drawReturn( card.age + 1 ) );
                                                                      return true;
                                                                   }
                                                                   return false; } ); } } ] };
@@ -35,7 +36,7 @@ var CodeOfLawsDogmas = function() {
    return [ { demand: false,
               execute: function( game, player )  {
                           var colorOnBoard = [];
-                          for( var i = 0; i < player.board.length; i++ ) {
+                          for( var i = 0; i < 5; i++ ) {
                              colorOnBoard[ i ] = ( player.board[ i ].cards.length != 0 );
                           }
                           var cardFromHandOfSameColor = [];
@@ -53,8 +54,9 @@ var CodeOfLawsDogmas = function() {
                                   if( cardName == null ) {
                                      return false;
                                   }
-                                  var card = player.removeFromHand( cardName );
-                                  player.tuck( card );
+                                  var card = cards[ cardName ];
+                                  player.removeFromHand( card );
+                                  game.tuck( player, card );
                                   player.reaction = new types.Reaction( 1, [ true, false ],
                                     function( ans ) {
                                        if( ans ) {
@@ -64,7 +66,7 @@ var CodeOfLawsDogmas = function() {
                                } );
                           return true; } } ] };
 
-exports.Cards = {
+var cards = {
       "Agriculture": new Card( "Agriculture", 1, types.Yellow, types.Hex, types.Leaf,
                             types.Leaf, types.Leaf, types.Leaf, AgricultureDogmas ),
 
@@ -187,3 +189,4 @@ exports.Cards = {
       "Stem Cells": new Card( "Stem Cells", 10, types.Yellow, types.Hex, types.Leaf, types.Leaf, types.Leaf, types.Leaf, [  function() {} ] ) ,
       "The Internet": new Card( "The Internet", 10, types.Purple, types.Hex, types.Clock, types.Clock, types.Lightbulb, types.Clock, [  function() {} ] )
 }
+exports.Cards = cards;
