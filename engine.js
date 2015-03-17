@@ -282,7 +282,7 @@ exports.Game = function( playerNames, numAchievements ) {
       player.reaction = null;
       player.perform = false;
       var shared = callback( entity );
-      if( shared === true ) {
+      if( shared === true && this.mainPlayer && playerName !== this.mainPlayer.name ) {
          this.sharingDraw = true;
       }
       var nextPlayer = player;

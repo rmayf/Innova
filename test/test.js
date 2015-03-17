@@ -440,3 +440,45 @@ describe( 'Card', function() {
       } )
    } )
 } )
+describe( 'Dogma', function() {
+   describe( 'Sharing draw:', function() {
+      beforeEach( function() {
+         player1.hand.push( cards[ 'Agriculture' ] );
+         player2.hand.push( cards[ 'Pottery' ] );
+         player1.actions = 2;
+         player2.actions = 1;
+         player1.reaction = null;
+         player2.reaction = null;
+         player1.perform = false;
+         player2.perform = false;
+         game.turn = 1;
+         game.action( player2.name, 'Meld', 'Pottery' );
+         game.action( player1.name, 'Meld', 'Agriculture' );
+         game.action( player1.name, 'Dogma', 'Agriculture' );
+      } )
+      it( 'other player accepts', function() {
+         expect( function() { game.reaction( player1.name, player1.reaction.list[ 0 ] ) } ).to.throw( Error, "turn to perform" );
+         game.reaction( player2.name, player2.reaction.list[ 0 ] );
+         expect( game.sharingDraw ).to.be.true;
+
+         expect( function() { game.reaction( player2.name, null ) } ).to.throw( Error, "has no reaction" );
+         var cardsInHandBefore = player1.hand.length;
+         game.reaction( player1.name, player1.reaction.list[ 0 ] );
+         expect( cardsInHandBefore ).to.equal( player1.hand.length );
+         expect( game.turn ).to.equal( 3 );
+         expect( player1.actions ).to.equal( 0 );
+         expect( player2.actions ).to.equal( 2 );
+         expect( player1.reaction ).to.be.null;
+         expect( player2.reaction ).to.be.null;
+      } )
+      it( 'other player denies', function() {
+         game.reaction( player2.name, player2.reaction.list[ player2.reaction.list.length - 1 ] );   
+         expect( player2.score() ).to.equal( 0 );
+         expect( player2.hand.length ).to.equal( 2 );
+         expect( game.sharingDraw ).to.equal.false;
+         game.reaction( player1.name, player1.reaction.list[ 0 ] );
+         expect( game.sharingDraw ).to.be.false;
+         expect( player1.hand.length ).to.equal( 1 );
+      } )
+   } )
+} )
