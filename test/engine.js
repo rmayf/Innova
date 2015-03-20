@@ -8,7 +8,12 @@ var game;
 var player1;
 var player2;
 beforeEach( function() {
-   game = new engine.Game( [ 'bob', 'janice' ], 6 ); 
+   game = new engine.Game( 2, 6, function( e ) {
+      if( e ) {
+         throw e; 
+      }
+   } ); 
+   game.begin( [ 'bob', 'janice' ] );
    player1 = game.players[ 0 ];
    player2 = game.players[ 1 ];
 } )
@@ -16,19 +21,19 @@ beforeEach( function() {
 describe( 'Game', function() {
    describe( 'constructor', function() {
       it( 'fails when numPlayers > 4', function() {
-         expect( function() { new engine.Game( [ 'bob', 'janice', 'frank', 'amy', 'stuart' ], 4 ) } ).to.throw( Error );
+         expect( function() { new engine.Game( 5, 4 ) } ).to.throw( Error );
       } )
       it( 'fails when numPlayers < 1', function()  {
-         expect( function() { new engine.Game( [], 4 ) } ).to.throw( Error );
+         expect( function() { new engine.Game( 0, 4 ) } ).to.throw( Error );
       } )
       it( 'fails when numAchievemenst < 1', function() {
-         expect( function() { new engine.Game( [ 'bob' ], 0 ) } ).to.throw( Error );
+         expect( function() { new engine.Game( 1, 0 ) } ).to.throw( Error );
       } )
       it( 'fails when numAchievemenst > 14', function() {
-         expect( function() { new engine.Game( [ 'bob' ], 15 ) } ).to.throw( Error );
+         expect( function() { new engine.Game( 1, 15 ) } ).to.throw( Error );
       } )
       it( 'succeeds under normal conditions', function() {
-         expect( function() { new engine.Game( [ 'bob', 'janice' ], 6 ) } ).to.be.ok;
+         expect( function() { new engine.Game( 2, 6 ) } ).to.be.ok;
       } )
    } )
    describe( 'initially', function() {

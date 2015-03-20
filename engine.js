@@ -123,17 +123,16 @@ function Board() {
    }
 }
 
-exports.Game = function( playerNames, numAchievements ) {
-   if( playerNames.length < 1 || playerNames.length > 4 ) {
-      throw new Error( "Invalid number of players" );
+exports.Game = function( numPlayers, numAchievements, callback ) {
+   if( numPlayers < 1 || numPlayers > 4 ) {
+      callback( new Error( "Invalid number of players" ) );
+      return;
    }
    if( numAchievements < 1 || numAchievements > 14 ) {
-      throw new Error( "Invalid number of achievements" );
+      callback( new Error( "Invalid number of achievements" ) );
+      return;
    }
    this.players = [];
-   for( var i = 0; i < playerNames.length; i++ ) {
-      this.players.push( new Player( playerNames[ i ] ) ); 
-   }
    this.numAchievements = numAchievements;
    this.sharingDraw = false;
    this.mainPlayer = null;
@@ -170,6 +169,32 @@ exports.Game = function( playerNames, numAchievements ) {
    this.specialAchievements[ types.Wonder ] = { name: 'Wonder' };
    this.specialAchievements[ types.Universe ] = { name: 'Universe' };
    this.turn = 0;
+   this.begin = function( playerNames ) {
+      for( var i = 0; i < playerNames.length; i++ ) {
+         this.players.push( new Player( playerNames[ i ] ) ); 
+      }
+      for( var i = 0; i < this.players.length; i++ ) {
+         this.players[ i ].hand.push( this.agePiles[ 0 ].pop() );
+         this.players[ i ].hand.push( this.agePiles[ 0 ].pop() );
+      }
+      var playerReady = [];
+      var numPlayers = this.players.length;
+      for( var i = 0; i < this.players.length; i++ ) {
+         var player = this.players[ i ];
+         var callback = ( function( player ) {
+            return ( function( cardName ) {
+                        var card = cards[ cardName ];
+                        player.removeFromHand( card );
+                        this.meld( player, card );
+                        playerReady.push( { cardName: cardName,
+                                              player: player } );
+                        return playerReady;
+                   } ).bind( this );
+         } ).bind( this );
+         player.reaction = new types.Reaction( 1, this.players[ i ].hand, callback( this.players[ i ] ) );
+         player.perform = true;
+      }
+   }
    this.drawReturn = function( age ) {
       var attemptAge = age;
       while( attemptAge <= 10 && this.agePiles[ attemptAge - 1 ].length === 0 ) {
@@ -211,27 +236,6 @@ exports.Game = function( playerNames, numAchievements ) {
          }
       }
       player.hand.push( this.drawReturn( age ) );
-   }
-   for( var i = 0; i < this.players.length; i++ ) {
-      this.players[ i ].hand.push( this.agePiles[ 0 ].pop() );
-      this.players[ i ].hand.push( this.agePiles[ 0 ].pop() );
-   }
-   var playerReady = [];
-   var numPlayers = this.players.length;
-   for( var i = 0; i < this.players.length; i++ ) {
-      var player = this.players[ i ];
-      var callback = ( function( player ) {
-         return ( function( cardName ) {
-                     var card = cards[ cardName ];
-                     player.removeFromHand( card );
-                     this.meld( player, card );
-                     playerReady.push( { cardName: cardName,
-                                           player: player } );
-                     return playerReady;
-                } ).bind( this );
-      } ).bind( this );
-      player.reaction = new types.Reaction( 1, this.players[ i ].hand, callback( this.players[ i ] ) );
-      player.perform = true;
    }
    this.nextDogma = function() {
       if( this.dogmas.length == 0 ) {
@@ -541,6 +545,7 @@ exports.Game = function( playerNames, numAchievements ) {
       this.checkUniverse( rxPlayer );
       this.checkUniverse( txPlayer );
    };
+   callback();
 }
 
 function shuffle(array) {
