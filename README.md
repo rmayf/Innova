@@ -27,4 +27,4 @@ Tests are written using [Mocha] and the test suite can be ran with `npm test`.
 
 [the innovation card list]: http://innovation.boardgamestrategy.net/innovation-card-list/
 [Mocha]: http://mochajs.org/
-[currently non-existant documentation]: (server.md)
+[currently non-existant documentation]: server.md
