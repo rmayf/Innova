@@ -2,21 +2,42 @@
 var engine = require( '../engine.js' );
 var net = require( 'net' );
 var struct = require( 'struct' );
-var server = require( '../server.js' );
+var serverHelper = require( '../server.js' );
+var Server = serverHelper.Server;
 var expect = require( 'chai' ).expect;
 
-var port = 6969;
-var client;
+var port = 1050;
+function portNum() {
+   port += 1;
+   return port;   
+}
 
-var header = struct()
-   .word8( 'type' )
+function newHeader() {
+   return struct()
+      .word8( 'type' )
+}
 
-var newGame = struct()
-   .struct( 'header', header )
-   .word8( 'numPlayers' )
-   .word8( 'numAchievements' )
+function newResponse() {
+   return struct()
+      .word8( 'type' )
+      .chars( 'key', serverHelper.keySize )
+}
 
-function sendReq( client, done, tx ) {
+function newJoin( key, name ) {
+   var join = struct()
+      .word8( 'type' )
+      .chars( 'key', serverHelper.keySize )
+      .word8( 'nameSize' )
+      .chars( 'name', name.length )
+   var proxy = join.allocate().fields
+   proxy.type = serverHelper.reqJoinGame;
+   proxy.key = key;
+   proxy.nameSize = name.length;
+   proxy.name = name;
+   return join;
+}
+
+function sendReq( client, tx, done ) {
    var chunkSize = 512
    var rx = new Buffer( chunkSize );
    var rxLength = 0;
@@ -40,76 +61,146 @@ function sendNewGameReq( client, done, numPlayers, numAchievements ) {
    numPlayers = numPlayers || 2;
    numAchievements = numAchievements || 6;
 
-   var msg = newGame
+   var newGame = struct()
+      .word8( 'type' )
+      .word8( 'numPlayers' )
+      .word8( 'numAchievements' )
       .allocate()
-   var proxy = msg.fields
-   proxy.header.type = server.reqNewGame;
+
+   var proxy = newGame.fields
+   proxy.type = serverHelper.reqNewGame;
    proxy.numPlayers = numPlayers;
    proxy.numAchievements = numAchievements;
-   sendReq( client, done, msg.buffer() );
+   sendReq( client, newGame.buffer(), done );
 }
 
-function newClient() {
+function newClient( port ) {
    return net.connect( port );
 }
 
 function startBasicGame( done ) {
-   server.start( port );
-   client = newClient();
+   var serv = new Server( portNum() );
+   var client = newClient( serv.port );
    sendNewGameReq( client, function( data ) {
       done( data );
    } )
+   return serv;
 }
 
-describe( 'New Server', function() {
+function successResponse( buf ) {
+   checkHeader( buf, serverHelper.respSuccess );
+}
 
-   describe( 'NewGame', function() {
-      var resp = struct()
-         .word8( 'type' )
-         .chars( 'key', server.keySize )
-      describe( 'valid request', function() {
-         before( function( done ) {
-            startBasicGame( function( data ) {
-               resp._setBuff( data );
-               done();
-            } )
-         } )
-         after( function() {
-            server.kill();
-         } )
+function errorResponse( buf ) {
+   checkHeader( buf, serverHelper.respError );
+}
 
-         it( 'success response code', function() {
-            expect( resp.get( 'type' ) ).to.equal( server.respSuccess );
-         } )
 
-         it( 'key has valid format', function() {
-            var regexStr = '[' + server.keyChars + ']{' + server.keySize + '}';
-            expect( resp.get( 'key' ) ).to.match( new RegExp( regexStr, 'i' ) )    
-         } )
-         it( 'server created game', function() {
-            var gameRecord = server.activeGames[ resp.get( 'key' ) ];
-            expect( gameRecord ).to.not.be.empty;
-            expect( gameRecord.numPlayers ).to.equal( 2 );
-         } )
+function checkHeader( buf, code ) {
+   var header = struct()
+      .word8( 'type' )
+   header._setBuff( buf );
+   expect( header.get( 'type' ) ).to.equal( code );
+}
+
+describe( 'Invalid Request', function() {
+   var rx;
+   var server;
+   var client;
+   before( function( done ) {
+      server = new Server( portNum() );
+      client = newClient( server.port );
+      var tx = newHeader()
+         .allocate()
+      tx.set( 'type', 0 ); 
+      sendReq( client, tx.buffer(), function( data ) {
+         rx = data;
+         done();
       } )
    } )
-   describe( 'bad request', function() {
+   after( function() {
+      server.close();
+   } )
+   it( 'Error response type', function() {
+      errorResponse( rx );   
+   } )
+   it( 'no games created', function() {
+      expect( Object.keys( server.activeGames ).length ).to.equal( 0 );
+   } )
+} )
+
+describe( 'NewGame Request', function() {
+   var resp = newResponse();
+   var server;
+   describe( 'valid', function() {
       before( function( done ) {
-         server.start( port );
-         client = newClient();
+         server = startBasicGame( function( data ) {
+            resp._setBuff( data );
+            done();
+         } )
+      } )
+      after( function() {
+         server.close();
+      } )
+
+      it( 'Success response type', function() {
+         successResponse( resp.buffer() );
+      } );
+      it( 'key has valid format', function() {
+         var regexStr = '[' + serverHelper.keyChars + ']{' + serverHelper.keySize + '}';
+         expect( resp.get( 'key' ) ).to.match( new RegExp( regexStr, 'i' ) )    
+      } )
+      it( 'server created game', function() {
+         var gameRecord = server.activeGames[ resp.get( 'key' ) ];
+         expect( gameRecord ).to.not.be.empty;
+         expect( gameRecord.numPlayers ).to.equal( 2 );
+      } )
+   } )
+   
+   describe( 'invalid', function() {
+      var rx;
+      var server;
+      var client;
+      before( function( done ) {
+         server = new Server( portNum() );
+         client = newClient( server.port );
          sendNewGameReq( client, function( data ) {
-            header._setBuff( data );
+            rx = data;
             done(); }, 7 );
       } )
       after( function() {
-         server.kill();
+         server.close();
       } )
 
-      it( 'err response code', function() {
-         expect( header.get( 'type' ) ).to.equal( server.respError );
-      } )
-      it( 'no games created', function() {
-         expect( Object.keys( server.activeGames ).length ).to.equal( 0 );
+      it( 'Error response type', function() {
+         errorResponse( rx );
       } )
    } )
+} )
+describe ( 'JoinGame Request', function() {
+   var server;
+   var key;
+   var client;
+   var rx;
+   before( function( done ) {
+      server = startBasicGame( function( data ) {
+         var resp = newResponse();
+         resp._setBuff( data );
+         key = resp.get( 'key' );
+         client = newClient( server.port );
+         var join = newJoin( key, 'testClient1' )
+         sendReq( client, join.buffer(), function( data ) {
+            rx = data;
+         } )
+         done();
+      } )
+   } )
+   after( function() {
+      server.close();
+   } )
+   /*
+   it( 'Success response type', function() {
+      successResponse( rx );
+   } )
+   */
 } )

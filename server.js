@@ -25,16 +25,14 @@ var keyChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 exports.keyChars = keyChars;
 var keySize = 16;
 exports.keySize = keySize;
-exports.activeGames;
 var server = null;
 
-exports.kill = function() {
-   server.close();
-} 
-exports.start = function( port ) {
-   server = net.createServer( function( sock ) {
+exports.Server = function( port ) {
+   this.port = port;
+   this.activeGames = {};
+   var activeGames = this.activeGames;
+   this._server = net.createServer( function( sock ) {
       console.log( 'new connection ' + sock.remoteAddress );
-      exports.activeGames = {};
       sock.on( 'data', function( data ) {
          var header = struct()
             .word8( 'type' )
@@ -66,11 +64,11 @@ exports.start = function( port ) {
                      return;
                   }
                   var key = makeKey()
-                  while( exports.activeGames[ key ] ) {
+                  while( activeGames[ key ] ) {
                      console.log( 'Duplicate key ' + key );
                      key = makeKey();
                   }
-                  exports.activeGames[ key ] = new GameRecord( game, req.numPlayers );
+                  activeGames[ key ] = new GameRecord( game, req.numPlayers );
                   resp.set( 'type', respSuccess );
                   resp.buffer().write( key, 1 );
                   sock.end( resp.buffer() );
@@ -81,16 +79,22 @@ exports.start = function( port ) {
                break;
             default:
                console.log( 'bad message type' );
-               sock.end( 'you suck, go away' );
+               sock.end( 'Error: you suck, go away' );
          }
       } )
    } ).listen( port, function() {
       console.log( 'Innovation server is live on ' + port );
    } );
+   this.close = function() {
+      this._server.close();
+   }
 }
 
-exports.stop = function() {
-   server.close();    
+function makeKey() {
+    var text = "";
+    for( var i=0; i < 16; i++ )
+        text += keyChars.charAt(Math.floor(Math.random() * keyChars.length));
+    return text;
 }
 
 if( require.main === module ) {
@@ -98,14 +102,5 @@ if( require.main === module ) {
       console.log( 'no port specified' );
       process.exit( 1 );
    }
-   exports.start( process.argv[ 2 ] );
-}
-
-function makeKey() {
-    var text = "";
-
-    for( var i=0; i < 16; i++ )
-        text += keyChars.charAt(Math.floor(Math.random() * keyChars.length));
-
-    return text;
+   server = exports.start( process.argv[ 2 ] );
 }
