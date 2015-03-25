@@ -14,12 +14,23 @@ has changed, signalling to the client to request an update.  This dual connectio
 
 ###Message Definitions
   all messages are expected to be big endian.  Strings are not null terminated.
+
 #####Error Response
 header  |error size      |error[ 0 ] | error[ 1 ] | ...
 --------|----------------|------|-----|-------|
 0x45|word8| char | char | ...
+
 #####New Game Request
 header| Number of Players | Number of Achievements
 ------|-------------------|-----------------------
 0x6E | word8 | word8
 
+#####New Game Response
+header| key[ 0 ] | ... | key[ 15 ]
+-----|-----------|-----|----------
+0x53 | char | ... | char
+
+#####Join Game Request
+header| key[ 15 ] | nameSize | name[ 0 ] | ... | name[ nameSize - 1 ]
+----|-------------|----------|-----------|-----|--------------------
+0x6A| char[ 15 ] | word8 | char | ... | char
