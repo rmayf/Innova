@@ -403,6 +403,54 @@ describe( 'Card', function() {
          expect( player1.score() ).to.equal( 0 );
       } )
    } )
+   describe( 'Archery', function() {
+      describe( 'callee has no cards', function() {
+         beforeEach( function() {
+            player1.hand = []
+            player2.hand = []
+            var dogmas = cards[ 'Archery' ].dogmas() 
+            dogmas[ 0 ].execute( game, player1, player2 )
+         } )
+         it( 'caller has one age 1 card', function() {
+            expect( player1.hand.length ).to.equal( 1 )
+         } )
+         it( 'callee still has no cards', function() {
+            expect( player2.hand.length ).to.equal( 0 )
+         } )
+      } )
+      describe( 'callee has higher age card', function() {
+         beforeEach( function() {
+            player1.hand = []
+            player2.hand = [ game.agePiles[ 2 ][ 0 ] ]
+            var dogmas = cards[ 'Archery' ].dogmas() 
+            dogmas[ 0 ].execute( game, player1, player2 )
+         } )
+         it( 'caller has age 3 card', function() {
+            expect( player1.hand[ 0 ].age ).to.equal( 3 )
+         } )
+         it( 'callee has age 1 card', function() {
+            expect( player2.hand[ 0 ].age ).to.equal( 1 )
+         } )
+      } )
+      describe( 'callee has multiple age 1 cards', function() {
+         beforeEach( function() {
+            player1.hand = []
+            player2.hand = player2.hand.concat( game.agePiles[ 2 ].slice( 0, 2 ) )
+            var dogmas = cards[ 'Archery' ].dogmas() 
+            dogmas[ 0 ].execute( game, player1, player2 )
+         } )
+         it( 'callee reaction is expected', function() {
+            expect( player2.reaction ).to.not.be.null;
+            expect( player2.reaction.list.length ).to.equal( 2 );
+         } )
+         it( 'callback behaves', function() {
+            var cardName = player2.reaction.list[ 0 ].name
+            player2.reaction.callback( cardName )
+            expect( player1.hand[ 0 ].name ).to.equal( cardName )
+            expect( player2.hand.length ).to.equal( 4 )
+         } )
+      } )
+   } )
    describe( 'Code of Laws', function() {
       var dogma;
       beforeEach( function() {

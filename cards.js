@@ -29,7 +29,32 @@ var AgricultureDogmas = function() {
                                                                      return true;
                                                                   }
                                                                   return false; } ); } } ] };
-var ArcheryDogmas;
+var ArcheryDogmas = function() {
+   return [ { demand: true,
+              execute: function( game, caller, player ) {
+                 game.draw( player, 1 )
+                 var highestCards = [ player.hand[ 0 ] ]
+                 var highestAge = player.hand[ 0 ].age
+                 for( var i = 1; i < player.hand.length; i++ ) {
+                    if( player.hand[ i ].age > highestAge ) {
+                       highestCards = [ player.hand[ i ] ]
+                       highestAge = player.hand[ i ].age
+                    } else if ( player.hand[ i ].age == highestAge ) {
+                       highestCards.push( player.hand[ i ] )
+                    }
+                 }
+                 var _exchange = function( card ) {
+                    caller.hand.push( card ) 
+                    player.hand.splice( player.hand.indexOf( card ), 1 )
+                 }
+                 if( highestCards.length == 1 ) {
+                    _exchange( highestCards[ 0 ] )
+                 } else {
+                    player.reaction = new types.Reaction( 1, highestCards, function( card ) {
+                       _exchange( cards[ card ] )
+                    } )
+                 }
+              } } ] }
 var CityStatesDogmas;
 var ClothingDogmas;
 var CodeOfLawsDogmas = function() {
