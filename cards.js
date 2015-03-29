@@ -10,6 +10,19 @@ var Card = function( name, age, color, topL, botL, botM, botR, dogmaSymbol, dogm
    this.dogmaSymbol = dogmaSymbol;
    this.dogmas = dogmas;
    this.toString = function() { return this.name };
+   this.contains = function( symbol ) {
+      if( this.symbols.topL == symbol ) {
+         return true;
+      } else if( this.symbols.botL == symbol ) {
+         return true;
+      } else if( this.symbols.botM == symbol ) {
+         return true;
+      } else if( this.symbols.botR == symbol ) {
+         return true;
+      } else {
+         return false;
+      }
+   }
 };
 
 var AgricultureDogmas = function() {
@@ -55,7 +68,30 @@ var ArcheryDogmas = function() {
                     } )
                  }
               } } ] }
-var CityStatesDogmas;
+var CityStatesDogmas = function() {
+   return [
+      {
+         demand: true,
+         execute: function( game, caller, callee ) {
+            if( callee.symbolCount()[ types.Castle ] >= 4 ) {
+               var castleTopCards = []
+               for( var i = 0; i < 5; i++ ) {
+                  if( callee.board[ i ].cards.length > 0 ) {
+                     if( callee.board[ i ].cards[ 0 ].contains( types.Castle ) ) {
+                        castleTopCards.push( callee.board[ i ].cards[ 0 ].name )
+                     }
+                  }
+               }
+               callee.reaction = new types.Reaction( 1, castleTopCards, function( topCard ) {
+                  game.transfer( callee, [ cards[ topCard ] ], callee.board,
+                                 caller, caller.board )   
+                  game.draw( callee, 1 )
+               } )
+            }
+         }
+      }
+   ]
+}
 var ClothingDogmas;
 var CodeOfLawsDogmas = function() {
    return [ { demand: false,
@@ -98,7 +134,7 @@ var cards = {
       "Archery": new Card( "Archery", 1, types.Red, types.Castle, types.Lightbulb,
                          types.Hex, types.Castle, types.Castle, ArcheryDogmas ),
       "City States": new Card( "City States", 1, types.Purple, types.Hex, types.Crown,
-                               types.Crown, types.Castle, types.Crown, [  function() {} ] ),
+                               types.Crown, types.Castle, types.Crown, CityStatesDogmas ),
       "Clothing": new Card( "Clothing", 1, types.Green, types.Hex, types.Crown, types.Leaf,
                           types.Leaf, types.Leaf, [  function() {} ] ),
       "Code of Laws": new Card( "Code of Laws", 1, types.Purple, types.Hex, types.Crown,

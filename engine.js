@@ -91,6 +91,10 @@ function Board() {
    this[ types.Purple ] = new Stack(),
    this[ types.Blue ] = new Stack(),
 
+   this.unshift = function( card ) {
+      this[ card.color ].cards.unshift( card )
+   }
+
    // Same functionality as array
    this.indexOf = function( card ) {
       var accum = 0;

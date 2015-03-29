@@ -452,6 +452,32 @@ describe( 'Card', function() {
          } )
       } )
    } )
+   describe( 'City States', function() {
+      var dogma;
+      beforeEach( function() {
+         dogma = cards[ 'City States' ].dogmas()[ 0 ] 
+         game.meld( player2, cards[ 'Masonry' ] )
+      } )
+      it( 'callee has less than 4 castles', function() {
+         dogma.execute( game, player1, player2 )
+         expect( player2.board[ types.Yellow ].cards.length ).to.equal( 1 )
+         expect( player1.board[ types.Yellow ].cards.length ).to.equal( 0 )
+      } )
+      it( 'callee is effected', function() {
+         game.meld( player2, cards[ 'Archery' ] )
+         player2.reaction = null
+         dogma.execute( game, player1, player2 )
+         expect( player2.reaction ).to.not.be.null
+         expect( player2.perform ).to.be.true
+         expect( player2.reaction.n ).to.equal( 1 )
+         expect( player2.reaction.list.length ).to.equal( 2 )
+         var selectedCard = cards[ player2.reaction.list[ 0 ] ]
+         player2.reaction.callback( selectedCard.name )
+         expect( player2.board[ selectedCard.color ].cards.length ).to.equal( 0 )
+         expect( player1.board[ selectedCard.color ].cards.length ).to.equal( 1 )
+         expect( player1.board[ selectedCard.color ].cards[ 0 ] ).to.equal( selectedCard )
+      } )
+   } )
    describe( 'Code of Laws', function() {
       var dogma;
       beforeEach( function() {
