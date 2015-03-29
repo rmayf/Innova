@@ -408,6 +408,7 @@ describe( 'Card', function() {
          beforeEach( function() {
             player1.hand = []
             player2.hand = []
+            player2.reaction = null
             var dogmas = cards[ 'Archery' ].dogmas() 
             dogmas[ 0 ].execute( game, player1, player2 )
          } )
@@ -527,6 +528,34 @@ describe( 'Dogma', function() {
          game.reaction( player1.name, player1.reaction.list[ 0 ] );
          expect( game.sharingDraw ).to.be.false;
          expect( player1.hand.length ).to.equal( 1 );
+      } )
+   } )
+   describe( 'Demand', function() {
+      it( 'caller has more symbols', function() {
+         var arch = cards[ 'Archery' ]
+         game.meld( player1, arch )
+         player1.actions = 1
+         player1.reaction = null
+         player2.reaction = null
+         player2.perform = false
+         game.action( player1.name, 'Dogma', arch.name )
+         expect( player2.reaction ).to.not.be.null
+         expect( player2.perform ).to.be.true
+      } )
+      it( 'caller has less symbols', function() {
+         var arch = cards[ 'Archery' ]
+         game.meld( player1, arch )
+         game.meld( player2, cards[ 'Domestication' ] )
+         player1.actions = 1
+         player1.reaction = null
+         player2.reaction = null
+         player2.perform = false
+         game.action( player1.name, 'Dogma', arch.name )
+         expect( player2.reaction ).to.be.null
+         expect( player2.perform ).to.be.false
+         expect( player1.hand.length ).to.equal( 2 )
+         expect( game.turn ).to.equal( 1 )
+         expect( player2.actions ).to.equal( 2 )
       } )
    } )
 } )

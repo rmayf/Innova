@@ -35,6 +35,10 @@ var ArcheryDogmas = function() {
                  game.draw( player, 1 )
                  var highestCards = [ player.hand[ 0 ] ]
                  var highestAge = player.hand[ 0 ].age
+                 var _exchange = function( card ) {
+                    caller.hand.push( card ) 
+                    player.hand.splice( player.hand.indexOf( card ), 1 )
+                 }
                  for( var i = 1; i < player.hand.length; i++ ) {
                     if( player.hand[ i ].age > highestAge ) {
                        highestCards = [ player.hand[ i ] ]
@@ -42,10 +46,6 @@ var ArcheryDogmas = function() {
                     } else if ( player.hand[ i ].age == highestAge ) {
                        highestCards.push( player.hand[ i ] )
                     }
-                 }
-                 var _exchange = function( card ) {
-                    caller.hand.push( card ) 
-                    player.hand.splice( player.hand.indexOf( card ), 1 )
                  }
                  if( highestCards.length == 1 ) {
                     _exchange( highestCards[ 0 ] )

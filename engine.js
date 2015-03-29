@@ -243,11 +243,9 @@ exports.Game = function( playerNames, numAchievements ) {
          var dogma = this.dogmas.shift();
          var game = this;
          if( dogma.demand ) {
-            for( var j = 0; j < this.demandPlayers; j++ ) {
-               var res = dogma.execute( game, player, this.demandPlayers[ j ] );
-               if( res ) {
-                  this.sharingDraw = true;
-               }
+            for( var j = 0; j < this.demandPlayers.length; j++ ) {
+               //no sharing draw for demand dogmas
+               dogma.execute( game, player, this.demandPlayers[ j ] );
             }
          } else {
             for( var j = 0; j < this.sharedPlayers.length; j++ ) {
