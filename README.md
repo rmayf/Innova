@@ -36,8 +36,8 @@ of the dogma effect.
    execute: function( game, caller, callee ) {}
 }
 ```
--caller is the player that activated that card's dogmas
--callee is the player currently being effected
+- caller is the player that activated that card's dogmas
+- callee is the player currently being effected
 
 ####Non-demand Dogma
 ```javascript
@@ -51,7 +51,8 @@ of the dogma effect.
                }
             }
 }
--The execute function returns true if the game state has changed to keep track of
+```
+- The execute function returns true if the game state has changed to keep track of
  an extra draw if this dogma effect is being shared.
 
 ###Sharing State
@@ -74,10 +75,14 @@ Reaction object.
 ####Reaction
 ```javascript
 {
-   n: number of elemnts of the list to select
-   list: list of strings
-   callback: function( [ string ] ) {}
+   n: int
+   list: []
+   callback: function( elements ) {}
 };
 ```
+- n: number of elements from the list the player must select
+- list: list containing strings representation of each option
+- callback: function to be called after the player has made their selection
+
 [the innovation card list]: http://innovation.boardgamestrategy.net/innovation-card-list/
 [Mocha]: http://mochajs.org/
