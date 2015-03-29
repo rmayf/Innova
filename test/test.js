@@ -488,7 +488,7 @@ describe( 'Card', function() {
    describe( 'City States', function() {
       var dogma;
       beforeEach( function() {
-         dogma = cards[ 'City States' ].dogmas()[ 0 ] 
+         dogma = cards[ 'City States' ].dogmas()[ 0 ]
          game.meld( player2, cards[ 'Masonry' ] )
       } )
       it( 'callee has less than 4 castles', function() {

@@ -84,7 +84,7 @@ var CityStatesDogmas = function() {
                }
                callee.reaction = new types.Reaction( 1, castleTopCards, function( topCard ) {
                   game.transfer( callee, [ cards[ topCard ] ], callee.board,
-                                 caller, caller.board )   
+                                 caller, caller.board )
                   game.draw( callee, 1 )
                } )
             }
