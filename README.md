@@ -78,7 +78,7 @@ Reaction object.
    n: int
    list: []
    callback: function( elements ) {}
-};
+}
 ```
 - n: number of elements from the list the player must select
 - list: list containing strings representation of each option
