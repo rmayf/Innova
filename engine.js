@@ -531,7 +531,7 @@ exports.Game = function( playerNames, numAchievements ) {
    };
    this.transfer = function( txPlayer, txCards, txSrc, rxPlayer, rxSrc ) {
       for( var i = 0; i < txCards.length; i++ ) {
-         rxSrc.push( txCards[ i ] );
+         rxSrc.unshift( txCards[ i ] );
       };
       for( var i = 0, len = txCards.length; i < len; i++ ) {
          idx = txSrc.indexOf( txCards[ i ] );

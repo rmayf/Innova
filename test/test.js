@@ -109,6 +109,39 @@ describe( 'Game', function() {
          expect( player2.actions ).to.equal( 1 );
       } )
    } )
+   describe( 'transfer', function() {
+      it( 'between arrays', function() {
+         var src = []
+         game.transfer( player1, [ 1 ], [ 1, 2, 3 ], player2, src )
+         expect( src.length ).to.equal( 1 )
+         expect( src[ 0 ] ).to.equal( 1 )
+      } )
+      it( 'multiple elements', function() {
+         var src = []
+         var tx = [ 1, 2, 3 ]
+         game.transfer( player1, [ 1, 3 ], tx, player2, src )
+         expect( src.length ).to.equal( 2 )
+         expect( tx.length ).to.equal( 1 )
+         expect( tx[ 0 ] ).to.equal( 2 )
+      } )
+      it( 'to board', function() {
+         var ag = cards[ 'Agriculture' ]
+         var src = [ ag ]
+         game.transfer( player1, src, src, player2, player2.board )
+         expect( src.length ).to.equal( 0 )
+         expect( player2.board[ ag.color ].cards.length ).to.equal( 1 )
+         expect( player2.board[ ag.color ].cards[ 0 ] ).to.equal( ag )
+      } )
+      it( 'from board', function() {
+         var ag = cards[ 'Agriculture' ]
+         var res = []
+         game.meld( player1, ag )
+         game.transfer( player1, [ ag ], player1.board, player2, res )
+         expect( player1.board[ ag.color ].cards.length ).to.equal( 0 )
+         expect( res.length ).to.equal( 1 )
+         expect( res[ 0 ] ).to.equal( ag )
+      } )
+   } )
 } )
 
 describe( 'Player', function() {

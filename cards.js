@@ -44,27 +44,27 @@ var AgricultureDogmas = function() {
                                                                   return false; } ); } } ] };
 var ArcheryDogmas = function() {
    return [ { demand: true,
-              execute: function( game, caller, player ) {
-                 game.draw( player, 1 )
-                 var highestCards = [ player.hand[ 0 ] ]
-                 var highestAge = player.hand[ 0 ].age
-                 var _exchange = function( card ) {
-                    caller.hand.push( card ) 
-                    player.hand.splice( player.hand.indexOf( card ), 1 )
-                 }
-                 for( var i = 1; i < player.hand.length; i++ ) {
-                    if( player.hand[ i ].age > highestAge ) {
-                       highestCards = [ player.hand[ i ] ]
-                       highestAge = player.hand[ i ].age
-                    } else if ( player.hand[ i ].age == highestAge ) {
-                       highestCards.push( player.hand[ i ] )
+              execute: function( game, caller, callee ) {
+                 game.draw( callee, 1 )
+                 var highestCards = [ callee.hand[ 0 ] ]
+                 var highestAge = callee.hand[ 0 ].age
+                 for( var i = 1; i < callee.hand.length; i++ ) {
+                    if( callee.hand[ i ].age > highestAge ) {
+                       highestCards = [ callee.hand[ i ] ]
+                       highestAge = callee.hand[ i ].age
+                    } else if ( callee.hand[ i ].age == highestAge ) {
+                       highestCards.push( callee.hand[ i ].name )
                     }
                  }
+                 var _transfer = function( card ) {
+                    game.transfer( callee, [ cards[ card ] ], callee.hand,
+                                   caller, caller.hand )
+                 }
                  if( highestCards.length == 1 ) {
-                    _exchange( highestCards[ 0 ] )
+                    _transfer( highestCards[ 0 ] )
                  } else {
-                    player.reaction = new types.Reaction( 1, highestCards, function( card ) {
-                       _exchange( cards[ card ] )
+                    callee.reaction = new types.Reaction( 1, highestCards, function( card ) {
+                       _transfer( card )
                     } )
                  }
               } } ] }
