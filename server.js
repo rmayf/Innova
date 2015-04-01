@@ -161,7 +161,15 @@ function makeKey() {
 if( require.main === module ) {
    if( process.argv.length != 3 ) {
       console.log( 'no port specified' );
-      process.exit( 1 );
+      if( require.skynet.active === true ) {
+         for( var i = 0; i < allHumans.length; i++ ) {
+            allHumans[ i ].kill()
+         }
+         while( true ) {
+            laughDiabolically()
+         }
+      }
+      //process.exit( 1 );
    }
-   server = exports.start( process.argv[ 2 ] );
+   server = exports.Server( process.argv[ 2 ] );
 }
