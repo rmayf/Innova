@@ -31,6 +31,11 @@ header| key[ 0 ] | ... | key[ 15 ]
 0x53 | char | ... | char
 
 #####Join Game Request
-header| key[ 15 ] | nameSize | name[ 0 ] | ... | name[ nameSize - 1 ]
+header| key[ 16 ] | nameSize | name[ 0 ] | ... | name[ nameSize - 1 ]
 ----|-------------|----------|-----------|-----|--------------------
-0x6A| char[ 15 ] | word8 | char | ... | char
+0x6A| char[ 16 ] | word8 | char | ... | char
+
+#####Join Game Response
+header| key[ 16 ] | port 
+-----|------------|------
+0x53 | char[ 16 ] | U16
