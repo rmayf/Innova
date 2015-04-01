@@ -99,7 +99,15 @@ function errorResponse( buf ) {
 function checkHeader( buf, code ) {
    var header = struct()
       .word8( 'type' )
+   var err = struct()
+      .word8( 'type' )
+      .word8( 'size' )
    header._setBuff( buf );
+   if( header.type == serverHelper.respError ) {
+      err._setBuff( buf )
+      err.chars( 'message', err.get( 'size' ) )
+      console.log( err.get( 'message' ) )
+   }
    expect( header.get( 'type' ) ).to.equal( code );
 }
 
@@ -153,7 +161,7 @@ describe( 'NewGame Request', function() {
       it( 'server created game', function() {
          var gameRecord = server.activeGames[ resp.get( 'key' ) ];
          expect( gameRecord ).to.not.be.empty;
-         expect( gameRecord.numPlayers ).to.equal( 2 );
+         expect( gameRecord.spotsLeft ).to.equal( 2 );
       } )
    } )
    
@@ -177,30 +185,63 @@ describe( 'NewGame Request', function() {
       } )
    } )
 } )
-describe ( 'JoinGame Request', function() {
+describe ( 'JoinGameRequest', function() {
    var server;
    var key;
-   var client;
-   var rx;
    before( function( done ) {
       server = startBasicGame( function( data ) {
          var resp = newResponse();
          resp._setBuff( data );
          key = resp.get( 'key' );
-         client = newClient( server.port );
-         var join = newJoin( key, 'testClient1' )
-         sendReq( client, join.buffer(), function( data ) {
-            rx = data;
-         } )
-         done();
+         done()
       } )
    } )
-   after( function() {
-      server.close();
+   describe( 'ValidRequests', function() {
+      var resp;
+      var req;
+      var clName = 'testClient1'
+      before( function( done ) {
+         req = newJoin( key, 'testClient1' )
+         var client = newClient( server.port );
+         sendReq( client, req.buffer(), function( data ) {
+            resp = data;
+            done()
+         } )
+      } )
+      after( function() {
+         server.close();
+      } )
+      it( 'Success response type', function() {
+         successResponse( resp );
+      } )
+      it( 'Server added player to gameRecord', function() {
+         var players = server.activeGames[ key ].players
+         expect( players[ clName ] ).to.not.be.null
+         expect( server.activeGames[ key ].spotsLeft ).to.equal( 1 )
+      } )
+      it( 'Client reconnect doesn\'t add new player', function() {
+         var client = newClient( server.port );
+         sendReq( client, req.buffer(), function( data ) {
+            successResponse( data )
+            expect( server.activeGames[ key ] ).to.not.be.null
+            expect( server.activeGames[ key ].players[ clName ] ).to.not.be.null
+            expect( server.activeGames[ key ].game ).to.not.be.null
+            expect( server.activeGames[ key ].players[ clName ].sock ).to.be.null
+         } )
+      } )
+      it( 'All players joined triggers game start', function() {
+         var join = newJoin( key, 'client2' )
+         var client = newClient( server.port );
+         sendReq( client, join.buffer(), function( data ) {
+            successResponse( data )
+            expect( server.activeGames[ key ] ).to.not.be.null
+            expect( server.activeGames[ key ].spotsLeft ).to.equal( 0 )
+         } )
+      } )
    } )
-   /*
-   it( 'Success response type', function() {
-      successResponse( rx );
+   describe( 'Invalid join request', function() {
+      it( 'bad key return error', function() {
+
+      } )
    } )
-   */
 } )

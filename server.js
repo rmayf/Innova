@@ -3,13 +3,9 @@ var engine = require( './engine.js' );
 var net = require( 'net' );
 var struct = require( 'struct' );
 
-
-
-
-
 function GameRecord( game, numPlayers ) {
    this.game = game;
-   this.numPlayers = numPlayers;
+   this.spotsLeft = numPlayers;
    this.players = [];
 }
 
@@ -29,6 +25,8 @@ var server = null;
 
 exports.Server = function( port ) {
    this.port = port;
+   this.streamingPort = port + 1;
+   var streamingPort = this.streamingPort
    this.activeGames = {};
    var activeGames = this.activeGames;
    this._server = net.createServer( function( sock ) {
@@ -36,14 +34,13 @@ exports.Server = function( port ) {
       sock.on( 'data', function( data ) {
          var header = struct()
             .word8( 'type' )
-
-         var newGame = struct()
-            .struct( 'header', header )
-            .word8( 'numPlayers' )
-            .word8( 'numAchievements' )
          header._setBuff( data );
          switch( header.get( 'type' ) ) {
             case reqNewGame:
+               var newGame = struct()
+                  .struct( 'header', header )
+                  .word8( 'numPlayers' )
+                  .word8( 'numAchievements' )
                newGame._setBuff( data );
                var req = newGame.fields;
                var game = new engine.Game( req.numPlayers, req.numAchievements, function( e ) {
@@ -61,7 +58,7 @@ exports.Server = function( port ) {
                      err.set( 'size', e.message.length ); 
                      err.set( 'message', e.message );
                      sock.end( err.buffer() );
-                     return;
+                     return
                   }
                   var key = makeKey()
                   while( activeGames[ key ] ) {
@@ -76,9 +73,62 @@ exports.Server = function( port ) {
                break;
             case reqJoinGame:
                console.log( "join game" );
+               var joinGame = struct()
+                  .word8( 'type' )
+                  .chars( 'key', keySize )
+                  .word8( 'nameSize' )
+               var err = struct
+               joinGame._setBuff( data )
+               var key = joinGame.get( 'key' )
+               var gameRec = activeGames[ key ]
+               if( gameRec == null ) {
+                  var msg = 'key error: game does not exist with the id: ' + key
+                  var err = struct()
+                     .word8( 'type' )
+                     .word8( 'size' )
+                     .chars( 'message', e.message.length )
+                     .allocate()
+                  err.set( 'type', respError )
+                  err.set( 'size', msg.length )
+                  err.set( 'message', msg )
+                  sock.end( err.buffer() )
+                  return
+               }
+               //joinGame.chars( 'name', joinGame.get( 'nameSize' ) )
+               var name = data.slice( keySize + joinGame.get( 'nameSize' ) + 2, data.length )
+               if( gameRec.players[ name ] == null && gameRec.spotsLeft == 0 ) {
+                  var msg = 'The game is already full'
+                  var err = struct()
+                     .word8( 'type' )
+                     .word8( 'size' )
+                     .chars( 'message', e.message.length )
+                     .allocate()
+                  err.set( 'type', respError )
+                  err.set( 'size', msg.length )
+                  err.set( 'message', msg )
+                  sock.end( err.buffer() )
+                  return
+               } 
+               // add the new key to the player map
+               gameRec.players[ name ] = { key: makeKey(),
+                                      sock: null }
+               // return the key
+               var resp = struct()
+                  .word8( 'type' )
+                  .chars( 'key', keySize )
+                  .word16Ube( 'port' )
+                  .allocate()
+               proxy = resp.fields
+               proxy.type = respSuccess
+               proxy.key = gameRec.players[ name ].key
+               proxy.port = streamingPort
+               if( gameRec.spotsLeft > 0 ) {
+                  gameRec.spotsLeft--
+               }
+               sock.end( resp.buffer() )
                break;
             default:
-               console.log( 'bad message type' );
+               console.log( 'bad message type: ' + header.get( 'type' ) )
                sock.end( 'Error: you suck, go away' );
          }
       } )
