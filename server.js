@@ -7,6 +7,7 @@ function GameRecord( game, numPlayers ) {
    this.game = game;
    this.spotsLeft = numPlayers;
    this.players = [];
+   this.began = false;
 }
 
 var respError = 'E'.charCodeAt();
@@ -43,7 +44,7 @@ exports.Server = function( port ) {
                   .word8( 'numAchievements' )
                newGame._setBuff( data );
                var req = newGame.fields;
-               var game = new engine.Game( req.numPlayers, req.numAchievements, function( e ) {
+               new engine.Game( req.numPlayers, req.numAchievements, function( e, game ) {
                   var resp = struct()
                      .word8( 'type' )
                      .chars( 'key', keySize )
@@ -94,8 +95,8 @@ exports.Server = function( port ) {
                   sock.end( err.buffer() )
                   return
                }
-               //joinGame.chars( 'name', joinGame.get( 'nameSize' ) )
-               var name = data.slice( keySize + joinGame.get( 'nameSize' ) + 2, data.length )
+               var nameSize = joinGame.get( 'nameSize' )
+               var name = data.slice( data.length - nameSize, data.length )
                if( gameRec.players[ name ] == null && gameRec.spotsLeft == 0 ) {
                   var msg = 'The game is already full'
                   var err = struct()
@@ -109,9 +110,12 @@ exports.Server = function( port ) {
                   sock.end( err.buffer() )
                   return
                } 
+               if( gameRec.players[ name ] == null ) {
+                  gameRec.spotsLeft--
+               }
                // add the new key to the player map
                gameRec.players[ name ] = { key: makeKey(),
-                                      sock: null }
+                                           sock: null }
                // return the key
                var resp = struct()
                   .word8( 'type' )
@@ -122,8 +126,15 @@ exports.Server = function( port ) {
                proxy.type = respSuccess
                proxy.key = gameRec.players[ name ].key
                proxy.port = streamingPort
-               if( gameRec.spotsLeft > 0 ) {
-                  gameRec.spotsLeft--
+               if( gameRec.spotsLeft == 0 ) {
+                  var playerNames = [];
+                  for( var name in gameRec.players ) {
+                     if( gameRec.players.hasOwnProperty( name ) ) {
+                        playerNames.push( playerNames );
+                     }
+                  }
+                  gameRec.game.begin( playerNames )
+                  gameRec.began = true
                }
                sock.end( resp.buffer() )
                break;

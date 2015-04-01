@@ -545,7 +545,7 @@ exports.Game = function( numPlayers, numAchievements, callback ) {
       this.checkUniverse( rxPlayer );
       this.checkUniverse( txPlayer );
    };
-   callback();
+   callback( null, this );
 }
 
 function shuffle(array) {

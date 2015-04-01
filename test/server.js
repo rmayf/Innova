@@ -21,6 +21,7 @@ function newResponse() {
    return struct()
       .word8( 'type' )
       .chars( 'key', serverHelper.keySize )
+      .word16Ube( 'port' )
 }
 
 function newJoin( key, name ) {
@@ -161,6 +162,7 @@ describe( 'NewGame Request', function() {
       it( 'server created game', function() {
          var gameRecord = server.activeGames[ resp.get( 'key' ) ];
          expect( gameRecord ).to.not.be.empty;
+         expect( gameRecord.game ).to.not.be.undefined
          expect( gameRecord.spotsLeft ).to.equal( 2 );
       } )
    } )
@@ -197,14 +199,15 @@ describe ( 'JoinGameRequest', function() {
       } )
    } )
    describe( 'ValidRequests', function() {
-      var resp;
+      var data;
       var req;
+      var playerKey;
       var clName = 'testClient1'
       before( function( done ) {
          req = newJoin( key, 'testClient1' )
          var client = newClient( server.port );
-         sendReq( client, req.buffer(), function( data ) {
-            resp = data;
+         sendReq( client, req.buffer(), function( data_ ) {
+            data = data_;
             done()
          } )
       } )
@@ -212,21 +215,27 @@ describe ( 'JoinGameRequest', function() {
          server.close();
       } )
       it( 'Success response type', function() {
-         successResponse( resp );
+         successResponse( data );
       } )
       it( 'Server added player to gameRecord', function() {
+         var resp = newResponse()
+         resp._setBuff( data )
          var players = server.activeGames[ key ].players
-         expect( players[ clName ] ).to.not.be.null
+         expect( players[ clName ] ).to.not.be.undefined
          expect( server.activeGames[ key ].spotsLeft ).to.equal( 1 )
+         playerKey = resp.get( 'key' )
+         expect( server.activeGames[ key ].players[ clName ].key ).to.equal( playerKey )
       } )
       it( 'Client reconnect doesn\'t add new player', function() {
          var client = newClient( server.port );
          sendReq( client, req.buffer(), function( data ) {
             successResponse( data )
-            expect( server.activeGames[ key ] ).to.not.be.null
-            expect( server.activeGames[ key ].players[ clName ] ).to.not.be.null
-            expect( server.activeGames[ key ].game ).to.not.be.null
-            expect( server.activeGames[ key ].players[ clName ].sock ).to.be.null
+            var gameRec = server.activeGames[ key ]
+            expect( gameRec ).to.not.be.undefined
+            expect( gameRec.players[ clName ] ).to.not.be.undefined
+            expect( gameRec.game ).to.not.be.undefined
+            expect( gameRec.players[ clName ].sock ).to.be.null
+            expect( gameRec.spotsLeft ).to.equal( 1 )
          } )
       } )
       it( 'All players joined triggers game start', function() {
@@ -234,14 +243,32 @@ describe ( 'JoinGameRequest', function() {
          var client = newClient( server.port );
          sendReq( client, join.buffer(), function( data ) {
             successResponse( data )
-            expect( server.activeGames[ key ] ).to.not.be.null
             expect( server.activeGames[ key ].spotsLeft ).to.equal( 0 )
+            expect( server.activeGames[ key ].began ).to.be.true
          } )
       } )
    } )
-   describe( 'Invalid join request', function() {
-      it( 'bad key return error', function() {
-
+   describe( 'Invalid join requests' ,function() {
+      it( 'bad game key', function() {
+         it( 'bad key return error', function() {
+            var join = newJoin( 'badgamekeyiiiiii', 'naughtyDog' )
+            var client = newClient( server.port );
+            sendReq( client, join.buffer(), function( data ) {
+               errorResponse( data )
+            } )
+         } )
+         it( 'try to join a game that already started', function() {
+            var join = newJoin( key, 'client2' )
+            var client = newClient( server.port );
+            sendReq( client, join.buffer(), function( data ) {
+               client = newClient( server.port )
+               join = newJoin( key, 'naughtydog' )
+               sendReq( client, join.buffer(), function( data ) {
+                  errorResponse( data )
+                  expect( server.activeGames[ key ].players[ 'naughtydog' ] ).to.be.undefined
+               } )
+            } )
+         } )
       } )
    } )
 } )
