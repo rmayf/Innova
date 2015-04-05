@@ -13,23 +13,23 @@ has changed, signalling to the client to request an update.  This dual connectio
 ###JSON Request Objects
 
 #####Create Game
-'''javascript
+```javascript
 {
    action: 'create'
    name: string
    players: int
    achievements: int
 }
-'''
+```
 
 #####Join Game
-'''javascript
+```javascript
 {
    action: 'join'
    name: string
    key: string
 }
-'''
+```
 
 
 
