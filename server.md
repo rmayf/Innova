@@ -10,6 +10,27 @@ has changed, signalling to the client to request an update.  This dual connectio
   * The server can detect when a client disconnects
   * Transactions eliminate the concern of TCP framing for larger messages in streaming tcp protocols
 
+###JSON Request Objects
+
+#####Create Game
+'''javascript
+{
+   action: 'create'
+   name: string
+   players: int
+   achievements: int
+}
+'''
+
+#####Join Game
+'''javascript
+{
+   action: 'join'
+   name: string
+   key: string
+}
+'''
+
 
 
 ###Message Definitions
