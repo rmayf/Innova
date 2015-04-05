@@ -8,7 +8,12 @@ var game;
 var player1;
 var player2;
 beforeEach( function() {
-   game = new engine.Game( [ 'bob', 'janice' ], 6 ); 
+   game = new engine.Game( 2, 6, function( e ) {
+      if( e ) {
+         throw e; 
+      }
+   } ); 
+   game.begin( [ 'bob', 'janice' ] );
    player1 = game.players[ 0 ];
    player2 = game.players[ 1 ];
 } )
@@ -16,19 +21,19 @@ beforeEach( function() {
 describe( 'Game', function() {
    describe( 'constructor', function() {
       it( 'fails when numPlayers > 4', function() {
-         expect( function() { new engine.Game( [ 'bob', 'janice', 'frank', 'amy', 'stuart' ], 4 ) } ).to.throw( Error );
+         expect( function() { new engine.Game( 5, 4 ) } ).to.throw( Error );
       } )
       it( 'fails when numPlayers < 1', function()  {
-         expect( function() { new engine.Game( [], 4 ) } ).to.throw( Error );
+         expect( function() { new engine.Game( 0, 4 ) } ).to.throw( Error );
       } )
-      it( 'fails when numAchievemenst < 1', function() {
-         expect( function() { new engine.Game( [ 'bob' ], 0 ) } ).to.throw( Error );
+      it( 'fails when numachievemenst < 1', function() {
+         expect( function() { new engine.Game( 1, 0 ) } ).to.throw( Error );
       } )
-      it( 'fails when numAchievemenst > 14', function() {
-         expect( function() { new engine.Game( [ 'bob' ], 15 ) } ).to.throw( Error );
+      it( 'fails when numachievemenst > 14', function() {
+         expect( function() { new engine.Game( 1, 15 ) } ).to.throw( Error );
       } )
       it( 'succeeds under normal conditions', function() {
-         expect( function() { new engine.Game( [ 'bob', 'janice' ], 6 ) } ).to.be.ok;
+         expect( function() { new engine.Game( 2, 6 ) } ).to.be.ok;
       } )
    } )
    describe( 'initially', function() {
@@ -89,14 +94,14 @@ describe( 'Game', function() {
       it( 'transitions to next player', function() {
          player1.actions = 1;
          game.turn = 1;
-         game.action( player1.name, 'Draw' );
+         game.action( player1.name, 'draw' );
          expect( game.turn ).to.equal( 2 );
          expect( game.players[ 1 ].actions ).to.equal( 2 );
       } )
       it( 'keeps track of the game turn', function() {
          player2.actions = 2;
-         game.action( player2.name, 'Draw' );
-         game.action( player2.name, 'Draw' );
+         game.action( player2.name, 'draw' );
+         game.action( player2.name, 'draw' );
          expect( game.turn ).to.equal( 1 );
          expect( player1.actions ).to.equal( 2 );
       } )
@@ -105,7 +110,7 @@ describe( 'Game', function() {
          game.players.push( 'haha' );
          game.turn = 1;
          player1.actions = 1;
-         game.action( player1.name, 'Draw' );
+         game.action( player1.name, 'draw' );
          expect( player2.actions ).to.equal( 1 );
       } )
    } )
@@ -140,6 +145,10 @@ describe( 'Game', function() {
          expect( player1.board[ ag.color ].cards.length ).to.equal( 0 )
          expect( res.length ).to.equal( 1 )
          expect( res[ 0 ] ).to.equal( ag )
+   describe( 'toJSON', function() {
+      it( 'aoeu', function() {
+         JSON.parse( game.serialize( 'bob' ) )
+         expect( true )
       } )
    } )
 } )
@@ -163,7 +172,7 @@ describe( 'Player', function() {
          player1.actions = 1;
          expect( player1.hand ).to.have.length( 2 );
          var meldCard = player1.hand[ 0 ];
-         game.action( player1.name, 'Meld', meldCard.name );
+         game.action( player1.name, 'meld', meldCard.name );
          expect( player1.actions ).to.equal( 0 );
          expect( player1.hand[ 0 ] ).to.not.equal( meldCard );
          expect( player1.hand ).to.have.length( 1 );
@@ -185,11 +194,11 @@ describe( 'Player', function() {
             player1.hand.push( game.achievements[ 1 ] );
          }
          player1.actions = 4;
-         game.action( player1.name, 'Meld', 'Philosophy' );
-         game.action( player1.name, 'Meld', 'Monotheism' );
+         game.action( player1.name, 'meld', 'Philosophy' );
+         game.action( player1.name, 'meld', 'Monotheism' );
          expect( player1.board[ types.Purple ].cards[ 0 ].name ).to.equal( 'Monotheism' );
-         game.action( player1.name, 'Meld', 'Canal Building' );
-         game.action( player1.name, 'Meld', 'Road Building' );
+         game.action( player1.name, 'meld', 'Canal Building' );
+         game.action( player1.name, 'meld', 'Road Building' );
          expect( player1.symbolCount() ).to.eql( [ 3, 1, 0, 2, 0, 0, 6 ] );
          player1.board[ types.Purple ].splay = types.Left;
          expect( player1.symbolCount() ).to.eql( [ 3, 1, 0, 2, 0, 1, 6 ] );
@@ -200,31 +209,31 @@ describe( 'Player', function() {
       } )
       it( 'achieve', function() {
          player1.actions = 1;
-         expect( function() { game.action( player1.name, 'Achieve', 11 ); } ).to.throw( Error, '11' );
-         expect( function() { game.action( player1.name, 'Achieve', 1 ); } ).to.throw( types.InvalidMove, 'enough' );
+         expect( function() { game.action( player1.name, 'achieve', 11 ); } ).to.throw( Error, '11' );
+         expect( function() { game.action( player1.name, 'achieve', 1 ); } ).to.throw( types.InvalidMove, 'enough' );
          player1.scoreCards.push( game.agePiles[ 4 ].pop() );
-         expect( function() { game.action( player1.name, 'Achieve', 1 ); } ).to.throw( types.InvalidMove, 'top card' );
+         expect( function() { game.action( player1.name, 'achieve', 1 ); } ).to.throw( types.InvalidMove, 'top card' );
          game.meld( player1, player1.hand[ 0 ] );
-         game.action( player1.name, 'Achieve', 1 );
+         game.action( player1.name, 'achieve', 1 );
          expect( player1.achievements ).to.have.length( 1 );
          expect( player1.actions ).to.equal( 0 );
          expect( game.achievements[ 0 ] ).to.be.null; 
          player1.actions = 1;
-         expect( function() { game.action( player1.name, 'Achieve', 1 ); } ).to.throw( types.InvalidMove, 'already' );
+         expect( function() { game.action( player1.name, 'achieve', 1 ); } ).to.throw( types.InvalidMove, 'already' );
          player1.scoreCards.push( game.agePiles[ 4 ].pop() );
          game.numAchievements = 2;
          var card = game.agePiles[ 1 ].pop();
          player1.hand.push( card );
          game.meld( player1, card );
-         expect( function() { game.action( player1.name, 'Achieve', 2 ); } ).to.throw( types.VictoryCondition, player1.name );
+         expect( function() { game.action( player1.name, 'achieve', 2 ); } ).to.throw( types.VictoryCondition, player1.name );
       } )
       it( 'draw', function() {
          player1.hand = [];
          var pileNum = game.agePiles[ 0 ].length;
-         expect( function() { game.action( player1.name, 'Draw' ) } ).to.throw( Error );
+         expect( function() { game.action( player1.name, 'draw' ) } ).to.throw( Error );
          player1.actions = 1;
-         expect( function() { game.action( 'noPlayer', 'Draw' ) } ).to.throw( Error );
-         game.action( player1.name, 'Draw' ); 
+         expect( function() { game.action( 'noPlayer', 'draw' ) } ).to.throw( Error );
+         game.action( player1.name, 'draw' ); 
          expect( player1.hand ).to.have.length( 1 );
          expect( game.agePiles[ 0 ] ).to.have.length( pileNum - 1 );
          expect( player1.actions ).to.equal( 0 );
@@ -234,7 +243,7 @@ describe( 'Player', function() {
          player1.board[ 0 ].cards.push( game.drawReturn( 4 ) );
          player1.actions = 1;
          player1.hand = [];
-         game.action( player1.name, 'Draw' );
+         game.action( player1.name, 'draw' );
          expect( player1.hand[ 0 ].age ).to.equal( 4 );
          expect( function() { game.drawReturn( 11 ); } ).to.throw( types.VictoryCondition, 'bob, janice' )
          player2.scoreCards.push( {age: 1 } );
@@ -252,9 +261,9 @@ describe( 'Player', function() {
          player1.hand.push( cards[ 'Archery' ] );
          game.meld( player1, dom );
          game.meld( player1, ag );
-         expect( function() { game.action( player1.name, 'Dogma', 'Oars' ) } ).to.throw( types.InvalidMove );
-         expect( function() { game.action( player1.name, 'Dogma', 'Domestication' ) } ).to.throw( types.InvalidMove );
-         game.action( player1.name, 'Dogma', 'Agriculture' );
+         expect( function() { game.action( player1.name, 'dogma', 'Oars' ) } ).to.throw( types.InvalidMove );
+         expect( function() { game.action( player1.name, 'dogma', 'Domestication' ) } ).to.throw( types.InvalidMove );
+         game.action( player1.name, 'dogma', 'Agriculture' );
          expect( player1.reaction ).to.not.be.null;
          expect( player2.reaction ).to.be.null;
          expect( player1.perform ).to.be.true;
@@ -376,7 +385,7 @@ describe( 'Player', function() {
             game.meld( player1, cards[ 'The Internet' ] );
             expect( player1.achievements ).to.have.length( 1 );
          } )
-         it( 'victory by Special Achievements', function() {
+         it( 'victory by Special achievements', function() {
             game.numAchievements = 1;
             game.meld( player1, cards[ 'Robotics' ] );
             game.meld( player1, cards[ 'Self Service' ] );
@@ -548,7 +557,7 @@ describe( 'Card', function() {
       } )
    } )
 } )
-describe( 'Dogma', function() {
+describe( 'dogma', function() {
    describe( 'Sharing draw:', function() {
       beforeEach( function() {
          player1.hand.push( cards[ 'Agriculture' ] );
@@ -560,9 +569,9 @@ describe( 'Dogma', function() {
          player1.perform = false;
          player2.perform = false;
          game.turn = 1;
-         game.action( player2.name, 'Meld', 'Pottery' );
-         game.action( player1.name, 'Meld', 'Agriculture' );
-         game.action( player1.name, 'Dogma', 'Agriculture' );
+         game.action( player2.name, 'meld', 'Pottery' );
+         game.action( player1.name, 'meld', 'Agriculture' );
+         game.action( player1.name, 'dogma', 'Agriculture' );
       } )
       it( 'other player accepts', function() {
          expect( function() { game.reaction( player1.name, player1.reaction.list[ 0 ] ) } ).to.throw( Error, "turn to perform" );

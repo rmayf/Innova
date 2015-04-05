@@ -5,8 +5,13 @@ Before starting development, run `npm install` to install module dependencies.
 Tests are written using [Mocha] and the test suite can be ran with `npm test`
 while in the Innova directory.
 
+- server.js:
+   Innova uses a c-style struct protocol over TCP for easy compatibility with 
+   different client-side front end implementations. Check out the 
+   [currently non-existant documentation] for more detail.   
+
 - engine.js:
-   Main file defining objects for maintaining game state.  
+   Core game file defining objects for maintaining game state.  
 
 - cards.js:
    I wrote a simple parser to generate this from [the innovation card list].
@@ -86,3 +91,4 @@ Reaction object.
 
 [the innovation card list]: http://innovation.boardgamestrategy.net/innovation-card-list/
 [Mocha]: http://mochajs.org/
+[currently non-existant documentation]: server.md

@@ -25,6 +25,8 @@ var Card = function( name, age, color, topL, botL, botM, botR, dogmaSymbol, dogm
    }
 };
 
+exports.Card = Card
+
 var AgricultureDogmas = function() {
    return [ { demand: false,
               execute: function( game, player ) {

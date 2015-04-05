@@ -3,7 +3,7 @@
    "description": "A stateful web server administering games of Innovation",
    "author": "Reid W. Mayfield",
    "version": "0.0.0",
-   "main": "engine.js",
+   "main": "server.js",
    "repository": {
       "type": "git",
       "url": "https://github.com/rmayf/Innova.git"
@@ -18,7 +18,8 @@
    },
    "devDependencies": {
       "mocha": "2.1.x",
-      "chai": "1.10.x"
+      "chai": "1.10.x",
+      "bunyan": "1.3.x"
    },
    "private": true
 }
