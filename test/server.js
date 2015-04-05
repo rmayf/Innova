@@ -1,7 +1,6 @@
 #!/usr/local/bin/node
 var engine = require( '../engine.js' );
 var net = require( 'net' );
-var struct = require( 'struct' );
 var serverHelper = require( '../server.js' );
 var Server = serverHelper.Server;
 var expect = require( 'chai' ).expect;
@@ -12,67 +11,31 @@ function portNum() {
    return port;   
 }
 
-function newHeader() {
-   return struct()
-      .word8( 'type' )
-}
-
-function newResponse() {
-   return struct()
-      .word8( 'type' )
-      .chars( 'key', serverHelper.keySize )
-      .word16Ube( 'port' )
-}
-
-function newJoin( key, name ) {
-   var join = struct()
-      .word8( 'type' )
-      .chars( 'key', serverHelper.keySize )
-      .word8( 'nameSize' )
-      .chars( 'name', name.length )
-   var proxy = join.allocate().fields
-   proxy.type = serverHelper.reqJoinGame;
-   proxy.key = key;
-   proxy.nameSize = name.length;
-   proxy.name = name;
-   return join;
-}
-
 function sendReq( client, tx, done ) {
    var chunkSize = 512
-   var rx = new Buffer( chunkSize );
+   var rx = ''
    var rxLength = 0;
    client.on( 'data', function( data ) {
-      if( data.length > rx.length - rxLength ) {
-         var bigBuf = new Buffer( rx.length + Math.max( chunkSize, data.length ) );
-         rx.copy( bigBuf );
-         rx = bigBuf;
-      }
-      data.copy( rx, rxLength );
-      rxLength += data.length;
+      rx += data
    } )
    client.on( 'close', function( e ) {
-      done( rx );
+      done( JSON.parse( rx ) );
    } )
    client.write( tx )
 }
 
-function sendNewGameReq( client, done, numPlayers, numAchievements ) {
+function sendNewGameReq( client, done, name, numPlayers, numAchievements ) {
    // Javascript's dumb way of setting default function parameters...
    numPlayers = numPlayers || 2;
    numAchievements = numAchievements || 6;
+   name = name || 'player'
 
-   var newGame = struct()
-      .word8( 'type' )
-      .word8( 'numPlayers' )
-      .word8( 'numAchievements' )
-      .allocate()
-
-   var proxy = newGame.fields
-   proxy.type = serverHelper.reqNewGame;
-   proxy.numPlayers = numPlayers;
-   proxy.numAchievements = numAchievements;
-   sendReq( client, newGame.buffer(), done );
+   var newGame = { action: serverHelper.actionCreate,
+                   name: name,
+                   players: numPlayers,
+                   achievements: numAchievements
+                 }
+   sendReq( client, JSON.stringify( newGame ), done );
 }
 
 function newClient( port ) {
@@ -88,187 +51,201 @@ function startBasicGame( done ) {
    return serv;
 }
 
-function successResponse( buf ) {
-   checkHeader( buf, serverHelper.respSuccess );
-}
-
-function errorResponse( buf ) {
-   checkHeader( buf, serverHelper.respError );
-}
-
-
-function checkHeader( buf, code ) {
-   var header = struct()
-      .word8( 'type' )
-   var err = struct()
-      .word8( 'type' )
-      .word8( 'size' )
-   header._setBuff( buf );
-   if( header.type == serverHelper.respError ) {
-      err._setBuff( buf )
-      err.chars( 'message', err.get( 'size' ) )
-      console.log( err.get( 'message' ) )
-   }
-   expect( header.get( 'type' ) ).to.equal( code );
-}
-
 describe( 'Invalid Request', function() {
-   var rx;
-   var server;
-   var client;
-   before( function( done ) {
+   var server
+   before( function() {
       server = new Server( portNum() );
-      client = newClient( server.port );
-      var tx = newHeader()
-         .allocate()
-      tx.set( 'type', 0 ); 
-      sendReq( client, tx.buffer(), function( data ) {
-         rx = data;
-         done();
-      } )
    } )
    after( function() {
       server.close();
    } )
-   it( 'Error response type', function() {
-      errorResponse( rx );   
+   it( 'JSON parse error', function( done ) {
+      sendReq( newClient( server.port ),
+               'please crash mister server', function( resp ) {
+         expect( resp.error ).to.be.true
+         done()
+      } )
    } )
-   it( 'no games created', function() {
-      expect( Object.keys( server.activeGames ).length ).to.equal( 0 );
+   it( 'unrecognized action field', function( done ) {
+      sendReq( newClient( server.port ),
+               JSON.stringify( { action: "suckaDICK" } ), function( resp ) {
+         expect( resp.error ).to.be.true 
+         done()
+      } )
    } )
 } )
 
 describe( 'NewGame Request', function() {
-   var resp = newResponse();
-   var server;
+   var resp
+   var server
    describe( 'valid', function() {
       before( function( done ) {
          server = startBasicGame( function( data ) {
-            resp._setBuff( data );
-            done();
+            resp = data
+            done()
          } )
       } )
       after( function() {
-         server.close();
+         server.close()
       } )
 
       it( 'Success response type', function() {
-         successResponse( resp.buffer() );
+         expect( resp.error ).to.be.undefined
       } );
       it( 'key has valid format', function() {
          var regexStr = '[' + serverHelper.keyChars + ']{' + serverHelper.keySize + '}';
-         expect( resp.get( 'key' ) ).to.match( new RegExp( regexStr, 'i' ) )    
+         expect( resp.gameKey ).to.match( new RegExp( regexStr, 'i' ) )    
+         expect( resp.playerKey ).to.match( new RegExp( regexStr, 'i' ) )    
       } )
       it( 'server created game', function() {
-         var gameRecord = server.activeGames[ resp.get( 'key' ) ];
+         var gameRecord = server.activeGames[ resp.gameKey ];
          expect( gameRecord ).to.not.be.empty;
          expect( gameRecord.game ).to.not.be.undefined
-         expect( gameRecord.spotsLeft ).to.equal( 2 );
+         expect( gameRecord.playerName.length ).to.equal( 1 );
+         expect( gameRecord.inProgress ).to.be.false
+         expect( gameRecord.players[ 'player' ] ).to.not.be.undefined
+         expect( gameRecord.players[ 'player' ].key ).to.equal( resp.playerKey )
+         expect( gameRecord.players[ 'player' ].sock ).to.be.null
       } )
    } )
    
    describe( 'invalid', function() {
-      var rx;
+      var resp;
       var server;
-      var client;
       before( function( done ) {
          server = new Server( portNum() );
          client = newClient( server.port );
-         sendNewGameReq( client, function( data ) {
-            rx = data;
-            done(); }, 7 );
+         sendNewGameReq( client, function( resp_ ) {
+            resp = resp_
+            done()
+         }, 'bilbo baggins', 5 )
       } )
       after( function() {
          server.close();
       } )
 
       it( 'Error response type', function() {
-         errorResponse( rx );
+         expect( resp.error ).to.be.true
       } )
    } )
 } )
-describe ( 'JoinGameRequest', function() {
-   var server;
-   var key;
+
+describe ( 'JoinGame Request', function() {
+   var server
+   var key_
    before( function( done ) {
       server = startBasicGame( function( data ) {
-         var resp = newResponse();
-         resp._setBuff( data );
-         key = resp.get( 'key' );
+         key_ = data.gameKey
          done()
       } )
    } )
+   after( function() {
+      server.close();
+   } )
    describe( 'ValidRequests', function() {
-      var data;
-      var req;
-      var playerKey;
-      var clName = 'testClient1'
+      var resp
+      var name = 'bilbo'
       before( function( done ) {
-         req = newJoin( key, 'testClient1' )
          var client = newClient( server.port );
-         sendReq( client, req.buffer(), function( data_ ) {
-            data = data_;
+         var join = { action: serverHelper.actionJoin,
+                      gameKey: key_,
+                      name: name }
+         sendReq( client, JSON.stringify( join ), function( data_ ) {
+            resp = data_;
             done()
          } )
       } )
-      after( function() {
-         server.close();
-      } )
       it( 'Success response type', function() {
-         successResponse( data );
+         expect( resp.error ).to.be.undefined
       } )
       it( 'Server added player to gameRecord', function() {
-         var resp = newResponse()
-         resp._setBuff( data )
-         var players = server.activeGames[ key ].players
-         expect( players[ clName ] ).to.not.be.undefined
-         expect( server.activeGames[ key ].spotsLeft ).to.equal( 1 )
-         playerKey = resp.get( 'key' )
-         expect( server.activeGames[ key ].players[ clName ].key ).to.equal( playerKey )
+         expect( server.activeGames[ key_ ].players[ name ].key )
+                     .to.equal( resp.playerKey )
       } )
       it( 'Client reconnect doesn\'t add new player', function() {
          var client = newClient( server.port );
-         sendReq( client, req.buffer(), function( data ) {
-            successResponse( data )
-            var gameRec = server.activeGames[ key ]
+         var join = { action: serverHelper.actionJoin,
+                      gameKey: key_,
+                      name: name }
+         sendReq( client, JSON.stringify( join ), function( data ) {
+            expect( data.error ).to.be.undefined
+            var gameRec = server.activeGames[ key_ ]
             expect( gameRec ).to.not.be.undefined
-            expect( gameRec.players[ clName ] ).to.not.be.undefined
+            expect( gameRec.players[ name ] ).to.not.be.undefined
             expect( gameRec.game ).to.not.be.undefined
-            expect( gameRec.players[ clName ].sock ).to.be.null
-            expect( gameRec.spotsLeft ).to.equal( 1 )
+            expect( gameRec.players[ name ].sock ).to.be.null
+            expect( gameRec.playerName.length ).to.equal( 2 )
          } )
       } )
       it( 'All players joined triggers game start', function() {
-         var join = newJoin( key, 'client2' )
+         expect( server.activeGames[ key_ ].playerName.length ).to.equal( 2 )
+         expect( server.activeGames[ key_ ].inProgress ).to.be.true
+      } )
+   } )
+
+   describe( 'Invalid join requests' ,function() {
+      it( 'bad game key', function() {
          var client = newClient( server.port );
-         sendReq( client, join.buffer(), function( data ) {
-            successResponse( data )
-            expect( server.activeGames[ key ].spotsLeft ).to.equal( 0 )
-            expect( server.activeGames[ key ].began ).to.be.true
+         var join = { action: serverHelper.actionJoin,
+                      gameKey: 'aoeuaoeuaoeuaoeu',
+                      name: 'naughtyDog' }
+         sendReq( client, JSON.stringify( join ), function( data ) {
+            expect( data.error ).to.be.true
+         } )
+      } )
+      it( 'try to join a game that already started', function() {
+         var client = newClient( server.port );
+         var join = { action: serverHelper.actionJoin,
+                      gameKey: key_,
+                      name: 'naughtyDog' }
+         sendReq( client, JSON.stringify( join ), function( data ) {
+            expect( data.error ).to.be.true
+            expect( server.activeGames[ key_ ].players[ 'naughtyDog' ] ).to.be.undefined
          } )
       } )
    } )
-   describe( 'Invalid join requests' ,function() {
-      it( 'bad game key', function() {
-         it( 'bad key return error', function() {
-            var join = newJoin( 'badgamekeyiiiiii', 'naughtyDog' )
-            var client = newClient( server.port );
-            sendReq( client, join.buffer(), function( data ) {
-               errorResponse( data )
-            } )
+} )
+
+describe( 'Update', function() {
+   var server
+   var gameKey
+   var playerKey
+   before( function( done ) {
+      server = startBasicGame( function( resp_ ) {
+         var resp = resp_
+         gameKey = resp.gameKey
+         var client = newClient( server.port )
+         var join = { action: serverHelper.actionJoin,
+                      gameKey: resp.gameKey,
+                      name: 'bilbo' }
+         sendReq( client, JSON.stringify( join ), function( data ) {
+            playerKey = data.playerKey 
+            done()
          } )
-         it( 'try to join a game that already started', function() {
-            var join = newJoin( key, 'client2' )
-            var client = newClient( server.port );
-            sendReq( client, join.buffer(), function( data ) {
-               client = newClient( server.port )
-               join = newJoin( key, 'naughtydog' )
-               sendReq( client, join.buffer(), function( data ) {
-                  errorResponse( data )
-                  expect( server.activeGames[ key ].players[ 'naughtydog' ] ).to.be.undefined
-               } )
-            } )
-         } )
+      } )
+   } )
+   after( function() {
+      server.close()   
+   } )
+   it( 'player gets correct state', function() {
+      var update = { action: serverHelper.actionUpdate,
+                     name: 'bilbo',
+                     playerKey: playerKey,
+                     gameKey: gameKey }
+      var client = newClient( server.port )
+      sendReq( client, JSON.stringify( update ), function( resp ) {
+         expect( resp.error ).to.be.undefined
+         expect( resp.sharingDraw ).to.be.undefined
+         expect( resp.agePiles[ 0 ] ).to.equal( 10 )
+         expect( resp.achievements[ 0 ] ).to.equal( true )
+         var bilbo = resp.players[ 0 ]
+         var other = resp.players[ 1 ]
+         if( bilbo.name != 'bilbo' ) {
+            bilbo = other
+            other = resp.players[ 0 ]
+         }
+         expect( bilbo.hand[ 0 ] ).to.not.equal( 1 )
+         expect( other.hand[ 0 ] ).to.equal( 1 )
       } )
    } )
 } )
