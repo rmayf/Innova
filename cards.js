@@ -94,7 +94,58 @@ var CityStatesDogmas = function() {
       }
    ]
 }
-var ClothingDogmas;
+var ClothingDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            var colorOnBoard = [];
+            for( var i = 0; i < 5; i++ ) {
+               colorOnBoard[ i ] = ( player.board[ i ].cards.length != 0 );
+            }
+            var cardFromHandOfDifferentColor = [];
+            for( var i = 0; i < player.hand.length; i++ ) {
+               if( !colorOnBoard[ player.hand[ i ].color ] ) {
+                  cardFromHandOfDifferentColor.push( player.hand[ i ] );   
+               }
+            }
+            if( cardFromHandOfDifferentColor.length == 0 ) {
+               return false;
+            }
+            player.reaction = new types.Reaction( 1, cardFromHandOfDifferentColor,
+               function( cardName ) {
+                  var card = cards[ cardName ];
+                  player.removeFromHand( card );
+                  game.meld( player, card );
+               } )
+            return true;
+         }
+      },
+      {
+         demand: false,
+         execute: function( game, player ) {
+            var changedState = false;
+            for( var i = 0; i < 5; i++ ) {
+               var colorOnBoard = ( player.board[ i ].cards.length != 0 );
+               var j = 0
+               for( ; j > game.players.length; j++ ) {
+                  var other = game.players[ j ]
+                  if( other != player ) {
+                     if( other.board[ i ].cards.length != 0 ) {
+                        break
+                     }
+                  }
+               }
+               if( j == game.players.length ) {
+                  changedState = true
+                  game.score( player, game.drawReturn( 1 ) )
+               }
+            }
+            return changedState
+         }
+      }
+   ]
+}
 var CodeOfLawsDogmas = function() {
    return [ { demand: false,
               execute: function( game, player )  {
@@ -138,7 +189,7 @@ var cards = {
       "City States": new Card( "City States", 1, types.Purple, types.Hex, types.Crown,
                                types.Crown, types.Castle, types.Crown, CityStatesDogmas ),
       "Clothing": new Card( "Clothing", 1, types.Green, types.Hex, types.Crown, types.Leaf,
-                          types.Leaf, types.Leaf, [  function() {} ] ),
+                          types.Leaf, types.Leaf, ClothingDogmas ),
       "Code of Laws": new Card( "Code of Laws", 1, types.Purple, types.Hex, types.Crown,
                                 types.Crown, types.Leaf, types.Crown, CodeOfLawsDogmas ),
       "Domestication": new Card( "Domestication", 1, types.Yellow, types.Castle, types.Crown,
