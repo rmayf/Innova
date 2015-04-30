@@ -292,10 +292,10 @@ exports.Game = function( numPlayers, numAchievements, callback ) {
       if( player.perform == false ) {
          throw new Error( 'not ' + playerName + '\'s turn to perform' );
       }
-      var callback = player.reaction.callback;
-      var shared = callback( entity );
-      player.reaction = null;
       player.perform = false;
+      var callback = player.reaction.callback;
+      player.reaction = null;
+      var shared = callback( entity );
       if( shared === true && this.mainPlayer && playerName !== this.mainPlayer.name ) {
          this.sharingDraw = true;
       }

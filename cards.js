@@ -162,7 +162,6 @@ var CodeOfLawsDogmas = function() {
                           if( cardFromHandOfSameColor.length == 0 ) {
                              return false;
                           }
-
                           player.reaction = new types.Reaction( 1, cardFromHandOfSameColor.concat( [ null ] ),
                                function( cardName ) {
                                   if( cardName == null ) {
