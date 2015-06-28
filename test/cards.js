@@ -4,6 +4,27 @@ var types = require( '../types' );
 var cards = require( '../cards' ).Cards;
 var expect = require( 'chai' ).expect;
 
+function initGame( players ) {
+   for( var i = 0; i < players.length; i++ ) {
+      var player = players[ i ]
+      player.ptr.actions = 0
+      player.ptr.perform = false
+      player.ptr.reaction = null
+      player.ptr.hand = []
+      for( var j = 0; j < player.hand.length; j++ ) {
+         var card = player.hand[ j ]
+         player.ptr.hand.push( cards[ card ] )
+      }
+      for( var j = 0; j < player.board.length; j++ ) {
+         var card = player.board[ j ]
+         game.meld( player.ptr, cards[ card ] )
+      }
+   }
+   game.turn = 1
+   players[ 0 ].ptr.actions = 2
+   players[ 0 ].ptr.perform = true
+}
+
 var game;
 var player1;
 var player2;
@@ -142,6 +163,45 @@ describe( 'City States', function() {
    } )
 } )
 
+describe( 'Clothing', function() {
+   beforeEach( function() {
+      initGame( [
+                  {
+                     ptr: player1,
+                     hand: [ "Sailing", "Agriculture", "Archery" ],
+                     board: [ "Clothing" ]
+                  },
+                  {
+                     ptr: player2,
+                     hand: [],
+                     board: [ "Oars" ]
+                  }
+               ]
+      )
+      game.action( player1.name, 'dogma', 'Clothing' ) 
+   } )
+   it( 'Executing dogma produces correct state', function() {
+      expect( player1.reaction ).to.not.be.null
+      expect( player1.perform ).to.be.true
+      expect( player2.perform ).to.be.false
+   } )
+   it( 'Reaction has the correct list of cards', function() {
+      expect( player1.reaction.n ).to.equal( 1 )
+      expect( player1.callback ).to.not.be.null
+      expect( player1.hand ).to.contain( cards[ "Archery" ] )
+      expect( player1.hand ).to.contain( cards[ "Agriculture" ] )
+   } )
+   it( 'Callback works', function() {
+      game.reaction( player1.name, 'Archery' )
+      expect( player1.hand ).to.not.contain( "Archery" )
+      expect( player1.board[ types.Red ].cards ).to.contain( cards[ 'Archery' ] )
+   } )
+   it( 'Second effect works', function() {
+      game.reaction( player1.name, 'Archery' )
+      expect( player1.score() ).to.equal( 1 )
+      expect( player2.score() ).to.equal( 0 )
+   } )
+} )
 describe( 'Code of Laws', function() {
    var dogma;
    beforeEach( function() {

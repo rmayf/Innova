@@ -126,19 +126,20 @@ var ClothingDogmas = function() {
          execute: function( game, player ) {
             var changedState = false;
             for( var i = 0; i < 5; i++ ) {
-               var colorOnBoard = ( player.board[ i ].cards.length != 0 );
-               var j = 0
-               for( ; j > game.players.length; j++ ) {
-                  var other = game.players[ j ]
-                  if( other != player ) {
-                     if( other.board[ i ].cards.length != 0 ) {
-                        break
+               if( player.board[ i ].cards.length != 0 ) {
+                  var j = 0
+                  for( ; j < game.players.length; j++ ) {
+                     var other = game.players[ j ]
+                     if( other != player ) {
+                        if( other.board[ i ].cards.length != 0 ) {
+                           break
+                        }
                      }
                   }
-               }
-               if( j == game.players.length ) {
-                  changedState = true
-                  game.score( player, game.drawReturn( 1 ) )
+                  if( j == game.players.length ) {
+                     changedState = true
+                     game.score( player, game.drawReturn( 1 ) )
+                  }
                }
             }
             return changedState
@@ -178,6 +179,66 @@ var CodeOfLawsDogmas = function() {
                                     } ); 
                                } );
                           return true; } } ] };
+var domesticationDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            var lowestCards = []
+            var lowestAge = 11
+            for( var i = 0; i < player.hand.length; i++ ) {
+               var card = player.hand[ i ]
+               if( card.age < lowestAge ) {
+                  lowestAge = card.age
+                  lowestCards = [ card ]
+               } else if( card.age == lowestAge ) {
+                  lowestCards.push( card )
+               }
+            }
+            player.reaction = new types.Reaction( 1, lowestCards ), function( cardName ) {
+               var card = cards[ cardName ]
+               player.removeFromHand( card )
+               game.meld( player, card )
+               return true
+            }
+         }
+      }
+   ]
+}
+var sailingDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            game.meld( player, game.drawReturn( 1 ) )
+            return true
+         }
+      }
+   ]
+}
+var theWheelDogmas = function() {
+   return [
+      { 
+         demand: false,
+         execute: function( game, player ) {
+            game.draw( player, 1 )
+            game.draw( player, 1 )
+            return true
+         }
+      }
+   ]
+}
+var writingDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            game.draw( player, 2 )
+            return true
+         }
+      }
+   ]
+}
 
 var cards = {
       "Agriculture": new Card( "Agriculture", 1, types.Yellow, types.Hex, types.Leaf,
@@ -192,7 +253,7 @@ var cards = {
       "Code of Laws": new Card( "Code of Laws", 1, types.Purple, types.Hex, types.Crown,
                                 types.Crown, types.Leaf, types.Crown, CodeOfLawsDogmas ),
       "Domestication": new Card( "Domestication", 1, types.Yellow, types.Castle, types.Crown,
-                               types.Hex, types.Castle, types.Castle, [  function() {} ] ),
+                               types.Hex, types.Castle, types.Castle, domesticationDogmas ),
       "Masonry": new Card( "Masonry", 1, types.Yellow, types.Castle, types.Hex, types.Castle,
                          types.Castle, types.Castle, [  function() {} ] ),
       "Metalworking": new Card( "Metalworking", 1, types.Red, types.Castle, types.Castle,
@@ -204,13 +265,13 @@ var cards = {
       "Pottery": new Card( "Pottery", 1, types.Blue, types.Hex, types.Leaf, types.Leaf,
                          types.Leaf, types.Leaf, [  function() {} ] ),
       "Sailing": new Card( "Sailing", 1, types.Green, types.Crown, types.Crown, types.Hex,
-                         types.Leaf, types.Crown, [  function() {} ] ),
+                         types.Leaf, types.Crown, sailingDogmas ),
       "The Wheel": new Card( "The Wheel", 1, types.Green, types.Hex, types.Castle,
-                             types.Castle, types.Castle, types.Castle, [  function() {} ] ),
+                             types.Castle, types.Castle, types.Castle, theWheelDogmas ),
       "Tools": new Card( "Tools", 1, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb,
                        types.Castle, types.Lightbulb, [  function() {} ] ),
       "Writing": new Card( "Writing", 1, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb,
-                         types.Crown, types.Lightbulb, [  function() {} ] ),
+                         types.Crown, types.Lightbulb, writingDogmas ),
       "Calendar": new Card( "Calendar", 2, types.Blue, types.Hex, types.Leaf, types.Leaf, types.Lightbulb, types.Leaf, [  function() {} ] ),
       "Canal Building": new Card( "Canal Building", 2, types.Yellow, types.Hex, types.Crown, types.Leaf, types.Crown, types.Crown, [  function() {} ] ) ,
       "Currency": new Card( "Currency", 2, types.Green, types.Leaf, types.Crown, types.Hex, types.Crown, types.Crown, [  function() {} ] ) ,
