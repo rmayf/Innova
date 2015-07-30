@@ -327,3 +327,26 @@ describe( 'Metalworking', function() {
       expect( player1.scoreCards.length ).to.equal( 0 )
    } )
 } )
+describe( 'Mysticism', function() {
+   var dogma
+   beforeEach( function() {
+      var mysticism = cards[ 'Mysticism' ]
+      dogma = mysticism.dogmas()[ 0 ].execute
+      game.meld( player1, mysticism )
+      player1.hand = []
+   } )
+   it( 'drawn card\'s color not on board', function() {
+      game.agePiles[ 0 ] = [ cards[ 'Agriculture' ] ]
+      dogma( game, player1 )
+      expect( player1.hand.length ).to.equal( 1 )
+      expect( player1.board[ types.Yellow ].cards.length ).to.equal( 0 )
+   } )
+   it( 'drawn card is same color as card on board', function() {
+      game.agePiles[ 0 ] = [ cards[ 'Agriculture' ], cards[ 'City States' ] ]
+      dogma( game, player1 )
+      expect( player1.hand.length ).to.equal( 1 )
+      expect( player1.hand[ 0 ].name ).to.equal( 'Agriculture' )
+      expect( player1.board[ types.Purple ].cards.length ).to.equal( 2 )
+      expect( player1.board[ types.Purple ].cards[ 0 ].name ).to.equal( 'City States' )
+   } )
+} )

@@ -270,6 +270,24 @@ var metalworkingDogmas = function() {
       }
    ]
 } 
+var mysticismDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            var card = game.drawReturn( 1 )
+            //reveal
+            if( player.board[ card.color ].cards.length > 0 ) {
+               game.meld( player, card )
+               game.draw( player, 1 )
+            } else {
+               player.hand.push( card )
+            }
+            return true
+         }
+      }
+   ]
+} 
 var sailingDogmas = function() {
    return [
       {
@@ -324,7 +342,7 @@ var cards = {
       "Metalworking": new Card( "Metalworking", 1, types.Red, types.Castle, types.Castle,
                               types.Hex, types.Castle, types.Castle, metalworkingDogmas ),
       "Mysticism": new Card( "Mysticism", 1, types.Purple, types.Hex, types.Castle, types.Castle,
-                           types.Castle, types.Castle, [  function() {} ] ),
+                           types.Castle, types.Castle, mysticismDogmas ),
       "Oars": new Card( "Oars", 1, types.Red, types.Castle, types.Crown, types.Hex, types.Castle,
                       types.Castle, [  function() {} ] ),
       "Pottery": new Card( "Pottery", 1, types.Blue, types.Hex, types.Leaf, types.Leaf,
