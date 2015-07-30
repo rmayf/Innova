@@ -288,6 +288,40 @@ var mysticismDogmas = function() {
       }
    ]
 } 
+var oarsDogmas = function() {
+   var cardTransferred = false
+   return [
+      {
+         demand: true,
+         execute: function( game, caller, callee ) {
+            //gather list of crown cards from callee
+            var crownCards = callee.hand.filter( function( card ) {
+               return card.contains( types.Crown )
+            } )
+            if( crownCards.length > 0 ) {
+               //create reaction for callee to select which one to xfr
+               callee.reaction = new types.Reaction( 1, crownCards, function( cardName ) {
+                  //xfr card from callee hand into caller scorepile
+                  caller.scoreCards.push( callee.removeFromHand( cards[ cardName ] ) )
+                  //callee draws a one
+                  game.draw( callee, 1 )
+                  cardTransferred = true
+               } )
+            }
+         }
+      },
+      {
+         demand: false,
+         execute: function( game, player ) {
+            if( !cardTransferred ) {
+               game.draw( player, 1 ) 
+               return true
+            }
+            return false
+         }
+      }
+   ]
+}
 var sailingDogmas = function() {
    return [
       {
@@ -344,7 +378,7 @@ var cards = {
       "Mysticism": new Card( "Mysticism", 1, types.Purple, types.Hex, types.Castle, types.Castle,
                            types.Castle, types.Castle, mysticismDogmas ),
       "Oars": new Card( "Oars", 1, types.Red, types.Castle, types.Crown, types.Hex, types.Castle,
-                      types.Castle, [  function() {} ] ),
+                      types.Castle, oarsDogmas ),
       "Pottery": new Card( "Pottery", 1, types.Blue, types.Hex, types.Leaf, types.Leaf,
                          types.Leaf, types.Leaf, [  function() {} ] ),
       "Sailing": new Card( "Sailing", 1, types.Green, types.Crown, types.Crown, types.Hex,

@@ -350,3 +350,45 @@ describe( 'Mysticism', function() {
       expect( player1.board[ types.Purple ].cards[ 0 ].name ).to.equal( 'City States' )
    } )
 } )
+describe( 'Oars', function() {
+   //need to store dogmas because of shared state
+   var dogmas
+   var demand
+   var dogma
+   beforeEach( function() {
+      var oars = cards[ 'Oars' ]
+      dogmas = oars.dogmas()
+      demand = dogmas[ 0 ].execute
+      dogma = dogmas[ 1 ].execute
+      player1.hand = []
+      player2.hand = []
+      game.meld( player1, oars )
+   } )
+   it( 'no crown cards', function() {
+      demand( game, player1, player2 )
+      dogma( game, player1 )
+      expect( player1.hand.length ).to.equal( 1 )
+   } )
+   it( 'selects only crown cards', function() {
+      player2.hand = [ cards[ 'Agriculture' ], cards[ 'City States' ], cards[ 'Clothing' ] ]
+      demand( game, player1, player2 )
+      expect( player2.reaction.list.length ).to.equal( 2 )
+   } )
+   it( 'card is successfully xfered and callee draws card', function() {
+      player2.hand = [ cards[ 'Agriculture' ], cards[ 'City States' ], cards[ 'Clothing' ] ]
+      demand( game, player1, player2 )
+      game.reaction( player2.name, 'Clothing' )
+      expect( player1.scoreCards.length ).to.equal( 1 )
+      expect( player1.scoreCards[ 0 ].name ).to.equal( 'Clothing' )
+      expect( player1.hand.length ).to.equal( 0 )
+      expect( player2.hand.length ).to.equal( 3 )
+      expect( player2.hand ).to.not.contain( cards[ 'Clothing' ] )
+   } )
+   it( '2nd effect only works when no card is xferred', function() {
+      player2.hand = [ cards[ 'Agriculture' ], cards[ 'City States' ], cards[ 'Clothing' ] ]
+      demand( game, player1, player2 )
+      game.reaction( player2.name, 'Clothing' )
+      dogma( game, player1 ) 
+      expect( player1.hand.length ).to.equal( 0 )
+   } )
+} )
