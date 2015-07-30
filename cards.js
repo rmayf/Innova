@@ -248,6 +248,28 @@ var masonryDogmas = function() {
       }
    ]
 }
+var metalworkingDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            var draw_ = function() {
+               var card = game.drawReturn( 1 )
+               console.log( card )
+               //reveal?
+               if( card.contains( types.Castle ) ) {
+                  game.score( player, card )
+                  draw_()
+               } else {
+                  player.hand.push( card )
+               }
+            }
+            draw_()
+            return true
+         } 
+      }
+   ]
+} 
 var sailingDogmas = function() {
    return [
       {
@@ -300,7 +322,7 @@ var cards = {
       "Masonry": new Card( "Masonry", 1, types.Yellow, types.Castle, types.Hex, types.Castle,
                          types.Castle, types.Castle, masonryDogmas ),
       "Metalworking": new Card( "Metalworking", 1, types.Red, types.Castle, types.Castle,
-                              types.Hex, types.Castle, types.Castle, [  function() {} ] ),
+                              types.Hex, types.Castle, types.Castle, metalworkingDogmas ),
       "Mysticism": new Card( "Mysticism", 1, types.Purple, types.Hex, types.Castle, types.Castle,
                            types.Castle, types.Castle, [  function() {} ] ),
       "Oars": new Card( "Oars", 1, types.Red, types.Castle, types.Crown, types.Hex, types.Castle,

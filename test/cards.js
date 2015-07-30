@@ -301,3 +301,29 @@ describe( 'Masonry', function() {
       expect( player1.achievements[ 0 ].name ).to.equal( 'Monument' )
    } )
 } )
+describe( 'Metalworking', function() {
+   var dogma
+   beforeEach( function() {
+      var metalworking = cards[ 'Metalworking' ]
+      dogma = metalworking.dogmas()[ 0 ].execute
+      player1.hand = []
+   } )
+   it( 'first card is non-castle', function() {
+      game.agePiles[ 0 ] = [ cards[ 'Agriculture' ] ]
+      dogma( game, player1 )
+      expect( player1.score() ).to.equal( 0 )
+      expect( player1.scoreCards.length ).to.equal( 0 )
+      expect( player1.hand.length ).to.equal( 1 )
+   } )
+   it( 'Score castle and repeat', function() {
+      game.agePiles[ 0 ] = [ cards[ 'Clothing' ], cards[ 'City States' ], cards[ 'Archery' ] ]
+      dogma( game, player1 )
+      expect( player1.scoreCards.length ).to.equal( 2 )
+      expect( player1.hand.length ).to.equal( 1 )
+   } )
+   it( 'stop after non castle', function() {
+      game.agePiles[ 0 ] = [ cards[ 'Archery' ], cards[ 'Agriculture' ] ]
+      dogma( game, player1 )
+      expect( player1.scoreCards.length ).to.equal( 0 )
+   } )
+} )
