@@ -211,6 +211,42 @@ var domesticationDogmas = function() {
       }
    ]
 }
+var masonryDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            //get list of all cards with castle
+            var castleCards = player.hand.filter( function( card ) {
+               return card.contains( types.castle )      
+            } )
+            //if list is not empty, create reaction
+            if( castleCards.length > 0 ) {
+               //meld each card in provided list in order
+               player.reaction = new types.Reaction( '<=' + castleCards.length, castleCards, function( cardsToMeld ) {
+                  if( cardsToMeld.length > 0 ) {
+                     for( var i = 0; i < cardsToMeld.length; i++ ) {
+                        var card = cards[ cardsToMeld[ i ] ]
+                        player.removeFromHand( card )
+                        game.meld( player, card )
+                     }
+                     // if melded 4 or more, gain monument
+                     if( cardsToMeld.length >= 4 ) {
+                        game.doAchieve( player, types.Monument )  
+                     }
+                     return true
+                  } else {
+                     return false
+                  }
+               }
+            } else {
+               //else return false
+               return false
+            }
+         }
+      }
+   ]
+}
 var sailingDogmas = function() {
    return [
       {
@@ -261,7 +297,7 @@ var cards = {
       "Domestication": new Card( "Domestication", 1, types.Yellow, types.Castle, types.Crown,
                                types.Hex, types.Castle, types.Castle, domesticationDogmas ),
       "Masonry": new Card( "Masonry", 1, types.Yellow, types.Castle, types.Hex, types.Castle,
-                         types.Castle, types.Castle, [  function() {} ] ),
+                         types.Castle, types.Castle, masonryDogmas ),
       "Metalworking": new Card( "Metalworking", 1, types.Red, types.Castle, types.Castle,
                               types.Hex, types.Castle, types.Castle, [  function() {} ] ),
       "Mysticism": new Card( "Mysticism", 1, types.Purple, types.Hex, types.Castle, types.Castle,
