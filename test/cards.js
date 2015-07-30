@@ -269,3 +269,35 @@ describe( 'Domestication', function() {
       expect( player1.hand.length ).to.equal( 1 )
    } )
 } )
+describe( 'Masonry', function() {
+   var dogma
+   beforeEach( function() {
+      var masonry = cards[ 'Masonry' ] 
+      game.meld( player1, masonry )
+      dogma = masonry.dogmas()[ 0 ].execute
+      player1.hand = [ cards[ 'Agriculture' ], cards[ 'Archery' ], cards[ 'Domestication' ], cards[ 'Metalworking' ], cards[ 'Mysticism' ] ]
+   } )
+   it( 'reaction selects only castle cards', function() {
+      dogma( game, player1 )
+      expect( player1.reaction ).to.not.be.null
+      expect( player1.reaction.list.length ).to.equal( 4 )
+   } )
+   it( 'can meld a card', function() {
+      dogma( game, player1 )
+      game.reaction( player1.name, [ 'Archery' ] )
+      expect( player1.hand.length ).to.equal( 4 )
+      expect( player1.achievements.length ).to.equal( 0 )
+      expect( player1.board[ types.Red ].cards.length ).to.equal( 1 )
+      expect( player1.board[ types.Red ].cards[ 0 ].name ).to.equal( 'Archery' )
+   } )
+   it( 'melds in correct order', function() {
+      dogma( game, player1 )
+      game.reaction( player1.name, [ 'Archery', 'Metalworking' ] )
+      expect( player1.board[ types.Red ].cards[ 0 ].name ).to.equal( 'Metalworking' )
+   } )
+   it( 'meld 4 or more gains achievement', function() {
+      dogma( game, player1 )
+      game.reaction( player1.name, [ 'Archery', 'Metalworking', 'Domestication', 'Mysticism' ] )
+      expect( player1.achievements[ 0 ].name ).to.equal( 'Monument' )
+   } )
+} )

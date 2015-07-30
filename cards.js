@@ -218,7 +218,8 @@ var masonryDogmas = function() {
          execute: function( game, player ) {
             //get list of all cards with castle
             var castleCards = player.hand.filter( function( card ) {
-               return card.contains( types.castle )      
+               console.log( card )
+               return card.contains( types.Castle )      
             } )
             //if list is not empty, create reaction
             if( castleCards.length > 0 ) {
@@ -238,7 +239,7 @@ var masonryDogmas = function() {
                   } else {
                      return false
                   }
-               }
+               } )
             } else {
                //else return false
                return false
