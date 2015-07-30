@@ -238,3 +238,34 @@ describe( 'Code of Laws', function() {
       expect( player1.board[ types.Blue ].splay ).to.equal( types.Left ); 
    } )
 } )
+describe( 'Domestication', function() {
+   var dogma
+   beforeEach( function() {
+      var domestication = cards[ 'Domestication' ]
+      dogma = domestication.dogmas()[ 0 ].execute
+      game.meld( player1, domestication )
+      player1.hand = [ cards[ 'Agriculture' ], cards[ 'Archery' ] ]
+   } )
+   it( 'meld card from hand of different color, draw 1', function() {
+      dogma( game, player1 )
+      game.reaction( player1.name, 'Archery' )
+      expect( player1.hand.length ).to.equal( 2 )
+      expect( player1.board[ types.Red ].cards.length ).to.equal( 1 )
+      expect( player1.board[ types.Red ].cards[ 0 ].name ).to.equal( 'Archery' )
+   } )
+   it( 'meld yellow card from hand, draw 1', function() {
+      dogma( game, player1 )
+      game.reaction( player1.name, 'Agriculture' )
+      expect( player1.board[ types.Yellow ].cards[ 0 ].name ).to.equal( 'Agriculture' )
+   } )
+   it( 'must meld lowest card', function() {
+      player1.hand.push( cards[ 'Calendar' ] )
+      dogma( game, player1 )
+      expect( player1.reaction.list.length ).to.equal( 2 )
+   } )
+   it( 'still draw even when hand can\'t meld', function() {
+      player1.hand = []
+      dogma( game, player1 )
+      expect( player1.hand.length ).to.equal( 1 )
+   } )
+} )

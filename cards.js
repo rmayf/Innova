@@ -195,10 +195,16 @@ var domesticationDogmas = function() {
                   lowestCards.push( card )
                }
             }
-            player.reaction = new types.Reaction( 1, lowestCards ), function( cardName ) {
-               var card = cards[ cardName ]
-               player.removeFromHand( card )
-               game.meld( player, card )
+            if( lowestCards.length > 0 ) {
+               player.reaction = new types.Reaction( 1, lowestCards, function( cardName ) {
+                  var card = cards[ cardName ]
+                  player.removeFromHand( card )
+                  game.meld( player, card )
+                  game.draw( player, 1 )
+                  return true
+               } )
+            } else {
+               game.draw( player, 1 )
                return true
             }
          }
