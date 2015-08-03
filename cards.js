@@ -217,7 +217,6 @@ var masonryDogmas = function() {
          execute: function( game, player ) {
             //get list of all cards with castle
             var castleCards = player.hand.filter( function( card ) {
-               console.log( card )
                return card.contains( types.Castle )      
             } )
             //if list is not empty, create reaction
@@ -254,7 +253,6 @@ var metalworkingDogmas = function() {
          execute: function( game, player ) {
             var draw_ = function() {
                var card = game.drawReturn( 1 )
-               console.log( card )
                //reveal?
                if( card.contains( types.Castle ) ) {
                   game.score( player, card )
