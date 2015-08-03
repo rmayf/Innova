@@ -37,8 +37,7 @@ var AgricultureDogmas = function() {
                                                                function( cardName ) {
                                                                   if( cardName != null ) {
                                                                      var card = cards[ cardName ];
-                                                                     player.removeFromHand( card );
-                                                                     game.agePiles[ card.age - 1 ].unshift( card );
+                                                                     game.return( player, card )
                                                                      game.score( player,
                                                                                  game.drawReturn( card.age + 1 ) );
                                                                      return true;

@@ -555,6 +555,10 @@ exports.Game = function( numPlayers, numAchievements, callback ) {
       this.checkUniverse( rxPlayer );
       this.checkUniverse( txPlayer );
    };
+   this.return = function( player, card ) {
+      player.removeFromHand( card )
+      this.agePiles[ card.age - 1 ].unshift( card )
+   }
    this.serialize = function( playerName ) {
       var player
       for( var i = 0; i < this.players.length; i++ ) {
