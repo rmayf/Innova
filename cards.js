@@ -23,26 +23,62 @@ var Card = function( name, age, color, topL, botL, botM, botR, dogmaSymbol, dogm
          return false;
       }
    }
-};
+}
 
 exports.Card = Card
 
+exports.translateCard = function( cardName ) {
+   if( cardName == null ) {
+      return null
+   }
+   // TODO
+   // Add more error checking, what if cardName is not a card?
+   // what if a list is passed in?
+   // cardName must be a string
+   // cardName must exist in cards object
+   return cards[ cardName ]
+}
+
+var translateCardList = function( cardList ) {
+   // TODO card list must be a list of strings that are valid cards
+   if( cardList == null ) {
+      return null
+   }
+   var cards = []
+   for( var i = 0; i < cardList.length; i++ ) {
+      cards.push( exports.translateCard( cardList[ i ] ) )
+   }
+   return cards
+}
+
+var translateBoolean = function( entity ) {
+   // TODO
+   // make sure it is a boolean
+   return entity
+}
+
 var AgricultureDogmas = function() {
-   return [ { demand: false,
-              execute: function( game, player ) {
-                           if( player.hand.length == 0 ) {
-                              return false;
-                           }
-                           player.reaction = new types.Reaction( 1, player.hand.concat( [ null ] ),
-                                                               function( cardName ) {
-                                                                  if( cardName != null ) {
-                                                                     var card = cards[ cardName ];
-                                                                     game.return( player, card )
-                                                                     game.score( player,
-                                                                                 game.drawReturn( card.age + 1 ) );
-                                                                     return true;
-                                                                  }
-                                                                  return false; } ); } } ] };
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            if( player.hand.length == 0 ) {
+               return false;
+            }
+            player.reaction = new types.Reaction( 1, player.hand.concat( [ null ] ), exports.translateCard,
+                                                  function( card ) {
+               if( card != null ) {
+                  game.return( player, card )
+                  game.score( player,
+                              game.drawReturn( card.age + 1 ) );
+                  return true;
+               }
+               return false
+            } )
+         }
+      }
+   ]
+}
 var ArcheryDogmas = function() {
    return [ { demand: true,
               execute: function( game, caller, callee ) {
@@ -64,7 +100,8 @@ var ArcheryDogmas = function() {
                  if( highestCards.length == 1 ) {
                     _transfer( highestCards[ 0 ] )
                  } else {
-                    callee.reaction = new types.Reaction( 1, highestCards, function( card ) {
+                    callee.reaction = new types.Reaction( 1, highestCards, exports.translateCard,
+                                                          function( card ) {
                        _transfer( card )
                     } )
                  }
@@ -83,7 +120,8 @@ var CityStatesDogmas = function() {
                      }
                   }
                }
-               callee.reaction = new types.Reaction( 1, castleTopCards, function( topCard ) {
+               callee.reaction = new types.Reaction( 1, castleTopCards, exports.translateCard,
+                                                     function( topCard ) {
                   game.transfer( callee, [ cards[ topCard ] ], callee.board,
                                  caller, caller.board )
                   game.draw( callee, 1 )
@@ -111,9 +149,8 @@ var ClothingDogmas = function() {
             if( cardFromHandOfDifferentColor.length == 0 ) {
                return false;
             }
-            player.reaction = new types.Reaction( 1, cardFromHandOfDifferentColor,
-               function( cardName ) {
-                  var card = cards[ cardName ];
+            player.reaction = new types.Reaction( 1, cardFromHandOfDifferentColor, exports.translateCard,
+               function( card ) {
                   player.removeFromHand( card );
                   game.meld( player, card );
                } )
@@ -163,15 +200,14 @@ var CodeOfLawsDogmas = function() {
                              return false;
                           }
                           player.reaction = new types.Reaction( 1, cardFromHandOfSameColor.concat( [ null ] ),
-                               function( cardName ) {
-                                  if( cardName == null ) {
+                                                                exports.translateCard, function( card ) {
+                                  if( card == null ) {
                                      return false;
                                   }
-                                  var card = cards[ cardName ];
                                   player.removeFromHand( card );
                                   game.tuck( player, card );
                                   player.reaction = new types.Reaction( 1, [ true, false ],
-                                    function( ans ) {
+                                                                        translateBoolean, function( ans ) {
                                        if( ans ) {
                                           player.board[ card.color ].splay = types.Left;
                                        }
@@ -195,8 +231,7 @@ var domesticationDogmas = function() {
                }
             }
             if( lowestCards.length > 0 ) {
-               player.reaction = new types.Reaction( 1, lowestCards, function( cardName ) {
-                  var card = cards[ cardName ]
+               player.reaction = new types.Reaction( 1, lowestCards, exports.translateCard, function( card ) {
                   player.removeFromHand( card )
                   game.meld( player, card )
                   game.draw( player, 1 )
@@ -222,8 +257,9 @@ var masonryDogmas = function() {
             //if list is not empty, create reaction
             if( castleCards.length > 0 ) {
                //meld each card in provided list in order
-               player.reaction = new types.Reaction( '<=' + castleCards.length, castleCards, function( cardsToMeld ) {
-                  if( cardsToMeld.length > 0 ) {
+               player.reaction = new types.Reaction( '<=' + castleCards.length, castleCards,translateCardList,
+                                                     function( cardsToMeld ) {
+                  if( cardsToMeld != null && cardsToMeld.length > 0 ) {
                      for( var i = 0; i < cardsToMeld.length; i++ ) {
                         var card = cards[ cardsToMeld[ i ] ]
                         player.removeFromHand( card )
@@ -297,9 +333,9 @@ var oarsDogmas = function() {
             } )
             if( crownCards.length > 0 ) {
                //create reaction for callee to select which one to xfr
-               callee.reaction = new types.Reaction( 1, crownCards, function( cardName ) {
+               callee.reaction = new types.Reaction( 1, crownCards, exports.translateCard, function( card ) {
                   //xfr card from callee hand into caller scorepile
-                  caller.scoreCards.push( callee.removeFromHand( cards[ cardName ] ) )
+                  caller.scoreCards.push( callee.removeFromHand( card ) )
                   //callee draws a one
                   game.draw( callee, 1 )
                   cardTransferred = true
@@ -315,6 +351,37 @@ var oarsDogmas = function() {
                return true
             }
             return false
+         }
+      }
+   ]
+}
+var potteryDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            var max = 3
+            if( player.hand.length < max ) {
+               max = player.hand.length
+            }
+            player.reaction = new types.Reaction( "<=" + max, player.hand, translateCardList, function( cards ) {
+               if( cards != null && cards.length > 0 ) {
+                  var i
+                  for( i = 0; i < cards.length; i++ ) {
+                     game.return( player, cards[ i ] )
+                  }
+                  game.score( player, game.drawReturn( i ) )
+                  return true
+               }
+               return false
+            } )
+         }
+      },
+      {
+         demand: false,
+         execute: function( game, player ) {
+            game.draw( player, 1 )
+            return true
          }
       }
    ]
@@ -338,6 +405,47 @@ var theWheelDogmas = function() {
             game.draw( player, 1 )
             game.draw( player, 1 )
             return true
+         }
+      }
+   ]
+}
+var toolsDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            player.reaction = new types.Reaction( '<=3', player.hand, translateCardList,
+                                                  function( cards ) {
+               if( cards != null && cards.length > 0 ) {
+                  for( var i = 0; i < cards.length; i++ ) {
+                     game.return( player, cards[ i ] )
+                  }
+                  if( cards.length == 3 ) {
+                     game.meld( game.drawReturn( 3 ) )
+                  }
+                  return true
+               }
+               return false
+            } )
+         }
+      },
+      {
+         demand: false,
+         execute: function( game, player ) {
+            var threesInHand = player.hand.filter( function( card ) {
+               return card.age == 3
+            } )
+            player.reaction = new types.Reaction( 1, threesInHand.concat( [ null ] ), exports.translateCard,
+                                                  function( card ) {
+               if( card != null ) {
+                  game.return( player, card )
+                  for( var i = 0; i < 3; i++ ) {
+                     game.draw( player, 1 )
+                  }
+                  return true
+               }
+               return false
+            } )
          }
       }
    ]
@@ -377,13 +485,13 @@ var cards = {
       "Oars": new Card( "Oars", 1, types.Red, types.Castle, types.Crown, types.Hex, types.Castle,
                       types.Castle, oarsDogmas ),
       "Pottery": new Card( "Pottery", 1, types.Blue, types.Hex, types.Leaf, types.Leaf,
-                         types.Leaf, types.Leaf, [  function() {} ] ),
+                         types.Leaf, types.Leaf, potteryDogmas ),
       "Sailing": new Card( "Sailing", 1, types.Green, types.Crown, types.Crown, types.Hex,
                          types.Leaf, types.Crown, sailingDogmas ),
       "The Wheel": new Card( "The Wheel", 1, types.Green, types.Hex, types.Castle,
                              types.Castle, types.Castle, types.Castle, theWheelDogmas ),
       "Tools": new Card( "Tools", 1, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb,
-                       types.Castle, types.Lightbulb, [  function() {} ] ),
+                       types.Castle, types.Lightbulb, toolsDogmas ),
       "Writing": new Card( "Writing", 1, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb,
                          types.Crown, types.Lightbulb, writingDogmas ),
       "Calendar": new Card( "Calendar", 2, types.Blue, types.Hex, types.Leaf, types.Leaf, types.Lightbulb, types.Leaf, [  function() {} ] ),

@@ -1,6 +1,7 @@
 var types = require( './types' );
 var cards = require( './cards' ).Cards;
 var Card = require( './cards' ).Card
+var cardTranslater = require( './cards' ).translateCard
 
 var Player = function( name ) {
    this.name = name;
@@ -191,19 +192,18 @@ exports.Game = function( numPlayers, numAchievements, callback ) {
       for( var i = 0; i < this.players.length; i++ ) {
          var player = this.players[ i ];
          var callback = ( function( player ) {
-            return ( function( cardName ) {
-                        var card = cards[ cardName ];
+            return ( function( card ) {
                         if( card === undefined ) {
-                           throw new types.InvalidMove( cardName + ' is not a card' )
+                           throw new types.InvalidMove( card.name + ' is not a card' )
                         }
                         player.removeFromHand( card );
                         this.meld( player, card );
-                        playerReady.push( { cardName: cardName,
+                        playerReady.push( { cardName: card.name,
                                               player: player } );
                         return playerReady;
                    } ).bind( this );
          } ).bind( this );
-         player.reaction = new types.Reaction( 1, this.players[ i ].hand, callback( this.players[ i ] ) );
+         player.reaction = new types.Reaction( 1, this.players[ i ].hand, cardTranslater, callback( this.players[ i ] ) );
          player.perform = true;
       }
    }
@@ -293,9 +293,12 @@ exports.Game = function( numPlayers, numAchievements, callback ) {
          throw new Error( 'not ' + playerName + '\'s turn to perform' );
       }
       player.perform = false;
-      var callback = player.reaction.callback;
-      player.reaction = null;
-      var shared = callback( entity );
+      var callback = player.reaction.callback
+      var translater = player.reaction.translate
+      player.reaction = null
+      entity = translater( entity )
+      // TODO: error check to make sure entity matches param n of reaction
+      var shared = callback( translater( entity ) );
       if( shared === true && this.mainPlayer && playerName !== this.mainPlayer.name ) {
          this.sharingDraw = true;
       }
@@ -311,7 +314,7 @@ exports.Game = function( numPlayers, numAchievements, callback ) {
          if( this.turn == 0 ) {
             var playerReady = shared;
             playerReady.sort( function( a, b ) {
-               return a.cardName.localeCompare( b.cardName ); 
+               return a.cardName.localeCompare( b.cardName )
             } );
             playerReady[ 0 ].player.actions = 1;
             this.turn++;

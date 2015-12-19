@@ -64,7 +64,7 @@ describe( 'Agriculture', function() {
       var card = game.agePiles[ 2 ].pop();
       player1.hand.push( card );
       dogma( game, player1 );
-      player1.reaction.callback( card.name );
+      player1.reaction.callback( card );
       expect( player1.scoreCards[ 0 ].age ).to.equal( 4 );
       expect( player1.score() ).to.equal( 4 );
       expect( player1.hand ).to.be.empty;
@@ -351,18 +351,17 @@ describe( 'Mysticism', function() {
    } )
 } )
 describe( 'Oars', function() {
-   //need to store dogmas because of shared state
-   var dogmas
    var demand
    var dogma
    beforeEach( function() {
       var oars = cards[ 'Oars' ]
-      dogmas = oars.dogmas()
+      var dogmas = oars.dogmas()
       demand = dogmas[ 0 ].execute
       dogma = dogmas[ 1 ].execute
       player1.hand = []
       player2.hand = []
       game.meld( player1, oars )
+      game.agePiles[ 0 ].push( cards[ 'Oars' ] )
    } )
    it( 'no crown cards', function() {
       demand( game, player1, player2 )
@@ -390,5 +389,75 @@ describe( 'Oars', function() {
       game.reaction( player2.name, 'Clothing' )
       dogma( game, player1 ) 
       expect( player1.hand.length ).to.equal( 0 )
+   } )
+} )
+describe( 'Pottery', function() {
+   var dogma1
+   var dogma2
+   beforeEach( function() {
+      var pottery = cards[ 'Pottery' ]
+      var dogmas = pottery.dogmas()
+      dogma1 = dogmas[ 0 ].execute
+      dogma2 = dogmas[ 1 ].execute
+      player1.hand = [ cards[ 'Agriculture' ], cards[ 'Oars' ], cards[ 'Metalworking' ],
+                       cards[ 'Sailing' ] ]
+   } )
+   it( 'Reaction has correct state', function() {
+      dogma1( game, player1 )
+      expect( player1.reaction.n ).to.equal( '<=3' )
+      expect( player1.reaction.list ).to.equal( player1.hand )
+   } )
+   it( 'Draw card equal to number returned', function() {
+      dogma1( game, player1 )
+      game.reaction( player1.name, [ 'Oars', 'Metalworking', 'Sailing' ] )
+      expect( player1.hand ).to.contain( cards[ 'Agriculture' ] )
+      expect( player1.scoreCards.length ).to.equal( 1 )
+      expect( player1.scoreCards[ 0 ].age ).to.equal( 3 )
+   } )
+   it( 'Second dogma works', function() {
+      dogma2( game, player1 )
+      expect( player1.hand.length ).to.equal( 5 )
+   } )
+} )
+describe( 'Sailing', function() {
+   var dogma
+   beforeEach( function() {
+      var card = cards[ 'Sailing' ]
+      dogma = card.dogmas()[ 0 ].execute
+      game.agePiles[ 0 ].push( cards[ 'Agriculture' ] )
+   } )
+   it( 'Draws and melds', function() {
+      dogma( game, player1 )
+      expect( player1.board[ types.Yellow ].cards.length ).to.equal( 1 )
+      expect( player1.board[ types.Yellow ].cards[ 0 ] ).to.equal( cards[ 'Agriculture' ] )
+   } )
+} )
+describe( 'The Wheel', function() {
+   var dogma
+   beforeEach( function() {
+      var card = cards[ 'The Wheel' ]
+      dogma = card.dogmas()[ 0 ].execute
+   } )
+   it( 'Player draws two age 1 cards', function() {
+      var ret = dogma( game, player1 )
+      expect( player1.hand.length ).to.equal( 4 )
+      expect( ret ).to.be.true
+   } )
+} )
+describe( 'Tools', function() {
+   
+} )
+describe( 'Writing', function() {
+   var dogma
+   beforeEach( function() {
+      var card = cards[ 'Writing' ]
+      dogma = card.dogmas()[ 0 ].execute
+      player1.hand = []
+   } )
+   it( 'Player draws a 2', function() {
+      var ret = dogma( game, player1 )
+      expect( player1.hand.length ).to.equal( 1 )
+      expect( player1.hand[ 0 ].age ).to.equal( 2 )
+      expect( ret ).to.be.true
    } )
 } )

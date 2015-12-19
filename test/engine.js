@@ -72,7 +72,7 @@ describe( 'Game', function() {
          expect( player1.board[ firstCard.color ].cards ).to.not.be.empty;
          var secondCard = player2.hand[ 0 ];
          game.reaction( player2.name, secondCard.name );
-         expect( player2.board[ secondCard.color ].cards).to.not.be.empty;
+         expect( player2.board[ secondCard.color ].cards ).to.not.be.empty;
          if( firstCard.name.localeCompare( secondCard.name ) > 0) {
             expect( player2.actions ).to.equal( 1 );
             expect( player1.actions ).to.equal( 0 );
@@ -298,7 +298,7 @@ describe( 'Player', function() {
                dogma = col.dogmas()[ 0 ].execute;
                for( var i = 0; i < 6; i++ ) {
                   dogma( game, player1 );
-                  player1.reaction.callback( player1.reaction.list[ 0 ].name );
+                  player1.reaction.callback( player1.reaction.list[ 0 ] );
                   player1.reaction.callback( true );
                }
                expect( player1.achievements[ 0 ].name ).to.equal( 'Monument' );
@@ -316,7 +316,7 @@ describe( 'Player', function() {
                dogma = ag.dogmas()[ 0 ].execute;
                for( var i = 0; i < 6; i++ ) {
                   dogma( game, player1 );
-                  player1.reaction.callback( player1.reaction.list[ 0 ].name );
+                  player1.reaction.callback( player1.reaction.list[ 0 ] );
                }
                expect( player1.achievements[ 0 ].name ).to.equal( 'Monument' );
             } )

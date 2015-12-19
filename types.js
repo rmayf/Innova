@@ -13,11 +13,12 @@ exports.VictoryCondition = function( players, msg ) {
    this.message += ': ' + msg;
 };
 
-exports.Reaction = function( n, list, callback ) {
-   this.n = n;
-   this.list = list;
-   this.callback = callback; 
-};
+exports.Reaction = function( n, list, translate, callback ) {
+   this.n = n
+   this.list = list
+   this.callback = callback
+   this.translate = translate
+}
 
 exports.Yellow = 0;
 exports.Red = 1;
