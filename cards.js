@@ -27,7 +27,7 @@ var Card = function( name, age, color, topL, botL, botM, botR, dogmaSymbol, dogm
 
 exports.Card = Card
 
-exports.translateCard = function( cardName ) {
+var translateCard = function( cardName ) {
    if( cardName == null ) {
       return null
    }
@@ -39,6 +39,8 @@ exports.translateCard = function( cardName ) {
    return cards[ cardName ]
 }
 
+exports.translateCard = translateCard
+
 var translateCardList = function( cardList ) {
    // TODO card list must be a list of strings that are valid cards
    if( cardList == null ) {
@@ -46,7 +48,7 @@ var translateCardList = function( cardList ) {
    }
    var cards = []
    for( var i = 0; i < cardList.length; i++ ) {
-      cards.push( exports.translateCard( cardList[ i ] ) )
+      cards.push( translateCard( cardList[ i ] ) )
    }
    return cards
 }
@@ -65,7 +67,7 @@ var AgricultureDogmas = function() {
             if( player.hand.length == 0 ) {
                return false;
             }
-            player.reaction = new types.Reaction( 1, player.hand.concat( [ null ] ), exports.translateCard,
+            player.reaction = new types.Reaction( 1, player.hand.concat( [ null ] ), translateCard,
                                                   function( card ) {
                if( card != null ) {
                   game.return( player, card )
@@ -100,7 +102,7 @@ var ArcheryDogmas = function() {
                  if( highestCards.length == 1 ) {
                     _transfer( highestCards[ 0 ] )
                  } else {
-                    callee.reaction = new types.Reaction( 1, highestCards, exports.translateCard,
+                    callee.reaction = new types.Reaction( 1, highestCards, translateCard,
                                                           function( card ) {
                        _transfer( card )
                     } )
@@ -120,7 +122,7 @@ var CityStatesDogmas = function() {
                      }
                   }
                }
-               callee.reaction = new types.Reaction( 1, castleTopCards, exports.translateCard,
+               callee.reaction = new types.Reaction( 1, castleTopCards, translateCard,
                                                      function( topCard ) {
                   game.transfer( callee, [ cards[ topCard ] ], callee.board,
                                  caller, caller.board )
@@ -149,7 +151,7 @@ var ClothingDogmas = function() {
             if( cardFromHandOfDifferentColor.length == 0 ) {
                return false;
             }
-            player.reaction = new types.Reaction( 1, cardFromHandOfDifferentColor, exports.translateCard,
+            player.reaction = new types.Reaction( 1, cardFromHandOfDifferentColor, translateCard,
                function( card ) {
                   player.removeFromHand( card );
                   game.meld( player, card );
@@ -200,7 +202,7 @@ var CodeOfLawsDogmas = function() {
                              return false;
                           }
                           player.reaction = new types.Reaction( 1, cardFromHandOfSameColor.concat( [ null ] ),
-                                                                exports.translateCard, function( card ) {
+                                                                translateCard, function( card ) {
                                   if( card == null ) {
                                      return false;
                                   }
@@ -231,7 +233,7 @@ var domesticationDogmas = function() {
                }
             }
             if( lowestCards.length > 0 ) {
-               player.reaction = new types.Reaction( 1, lowestCards, exports.translateCard, function( card ) {
+               player.reaction = new types.Reaction( 1, lowestCards, translateCard, function( card ) {
                   player.removeFromHand( card )
                   game.meld( player, card )
                   game.draw( player, 1 )
@@ -333,7 +335,7 @@ var oarsDogmas = function() {
             } )
             if( crownCards.length > 0 ) {
                //create reaction for callee to select which one to xfr
-               callee.reaction = new types.Reaction( 1, crownCards, exports.translateCard, function( card ) {
+               callee.reaction = new types.Reaction( 1, crownCards, translateCard, function( card ) {
                   //xfr card from callee hand into caller scorepile
                   caller.scoreCards.push( callee.removeFromHand( card ) )
                   //callee draws a one
@@ -414,19 +416,23 @@ var toolsDogmas = function() {
       {
          demand: false,
          execute: function( game, player ) {
-            player.reaction = new types.Reaction( '<=3', player.hand, translateCardList,
-                                                  function( cards ) {
-               if( cards != null && cards.length > 0 ) {
-                  for( var i = 0; i < cards.length; i++ ) {
-                     game.return( player, cards[ i ] )
+            if( player.hand.length > 0 ) {
+               player.reaction = new types.Reaction( '<=3', player.hand, translateCardList,
+                                                     function( cards ) {
+                  if( cards != null && cards.length > 0 ) {
+                     var len = cards.length
+                     for( var i = 0; i < len; i++ ) {
+                        game.return( player, cards[ i ] )
+                     }
+                     if( cards.length == 3 ) {
+                        game.meld( player, game.drawReturn( 3 ) )
+                     }
+                     return true
                   }
-                  if( cards.length == 3 ) {
-                     game.meld( game.drawReturn( 3 ) )
-                  }
-                  return true
-               }
-               return false
-            } )
+                  return false
+               } )
+            }
+            return false
          }
       },
       {
@@ -435,17 +441,22 @@ var toolsDogmas = function() {
             var threesInHand = player.hand.filter( function( card ) {
                return card.age == 3
             } )
-            player.reaction = new types.Reaction( 1, threesInHand.concat( [ null ] ), exports.translateCard,
-                                                  function( card ) {
-               if( card != null ) {
-                  game.return( player, card )
-                  for( var i = 0; i < 3; i++ ) {
-                     game.draw( player, 1 )
+            if( threesInHand.length > 0 ) {
+               player.reaction = new types.Reaction( 1,
+                                                     threesInHand.concat( [ null ] ),
+                                                     translateCard,
+                                                     function( card ) {
+                  if( card != null ) {
+                     game.return( player, card )
+                     for( var i = 0; i < 3; i++ ) {
+                        game.draw( player, 1 )
+                     }
+                     return true
                   }
-                  return true
-               }
-               return false
-            } )
+                  return false
+               } )
+            }
+            return false
          }
       }
    ]

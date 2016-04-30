@@ -87,11 +87,17 @@ function Stack() {
 }
 
 function Board() {
-   this[ types.Yellow ] =  new Stack(),
-   this[ types.Red ] = new Stack(),
-   this[ types.Green ] = new Stack(),
-   this[ types.Purple ] = new Stack(),
-   this[ types.Blue ] = new Stack(),
+   for( var i = new types.ColorIterator(); i.valid(); i.next() ) {
+      this[ i.value() ] = new Stack()
+   }
+
+   this.length = function() {
+      var cardsOnBoard = 0
+      for( var i = new types.ColorIterator(); i.valid(); i.next() ) {
+         cardsOnBoard += this[ i.value() ].cards.length
+      }
+      return cardsOnBoard
+   }
 
    this.unshift = function( card ) {
       this[ card.color ].cards.unshift( card )

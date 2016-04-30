@@ -25,6 +25,20 @@ exports.Red = 1;
 exports.Green = 2;
 exports.Purple = 3;
 exports.Blue = 4;
+exports.ColorIterator = function() {
+   this.n = 0
+   this.next = function() {
+      if( this.n <= exports.Blue ) {
+         this.n += 1
+      }
+   }
+   this.value = function() {
+      return this.n
+   }
+   this.valid = function() {
+      return this.n <= exports.Blue
+   }
+}
 
 exports.Hex = 0;
 exports.Leaf = 1;

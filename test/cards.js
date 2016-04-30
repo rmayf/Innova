@@ -4,30 +4,37 @@ var types = require( '../types' );
 var cards = require( '../cards' ).Cards;
 var expect = require( 'chai' ).expect;
 
-function initGame( players ) {
+var players
+function initGame( setup ) {
    for( var i = 0; i < players.length; i++ ) {
       var player = players[ i ]
-      player.ptr.actions = 0
-      player.ptr.perform = false
-      player.ptr.reaction = null
-      player.ptr.hand = []
-      for( var j = 0; j < player.hand.length; j++ ) {
-         var card = player.hand[ j ]
-         player.ptr.hand.push( cards[ card ] )
-      }
-      for( var j = 0; j < player.board.length; j++ ) {
-         var card = player.board[ j ]
-         game.meld( player.ptr, cards[ card ] )
+      player.actions = 0
+      player.perform = false
+      player.reaction = null
+      player.hand = []
+      if( setup[ i ] ) {
+         if( setup[ i ].hand != null ) {
+            for( var j = 0; j < setup[ i ].hand.length; j++ ) {
+               var card = setup[ i ].hand[ j ]
+               player.hand.push( cards[ card ] )
+            }
+         }
+         if( setup[ i ].board != null ) {
+            for( var j = 0; j < setup[ i ].board.length; j++ ) {
+               var card = setup[ i ].board[ j ]
+               game.meld( player, cards[ card ] )
+            }
+         }
       }
    }
    game.turn = 1
-   players[ 0 ].ptr.actions = 2
-   players[ 0 ].ptr.perform = true
+   players[ 0 ].actions = 2
+   players[ 0 ].perform = true
 }
 
-var game;
-var player1;
-var player2;
+var game
+var player1
+var player2
 beforeEach( function() {
    game = new engine.Game( 2, 6, function( e ) {
       if( e ) {
@@ -37,6 +44,9 @@ beforeEach( function() {
    game.begin( [ 'bob', 'janice' ] );
    player1 = game.players[ 0 ];
    player2 = game.players[ 1 ];
+   players = []
+   players.push( player1 )
+   players.push( player2 )
 } )
 
 describe( 'Agriculture', function() {
@@ -75,7 +85,7 @@ describe( 'Agriculture', function() {
       var age9Card = game.agePiles[ 8 ].pop();
       player1.hand.splice( 0, 0, age2Card, age9Card );
       dogma( game, player1 );
-      game.reaction( player1.name, age9Card.name);
+      game.reaction( player1.name, age9Card.name );
       expect( player1.score() ).to.equal( 10 );
    } )
    it( 'allows player to decline', function() {
@@ -167,12 +177,10 @@ describe( 'Clothing', function() {
    beforeEach( function() {
       initGame( [
                   {
-                     ptr: player1,
                      hand: [ "Sailing", "Agriculture", "Archery" ],
                      board: [ "Clothing" ]
                   },
                   {
-                     ptr: player2,
                      hand: [],
                      board: [ "Oars" ]
                   }
@@ -445,7 +453,77 @@ describe( 'The Wheel', function() {
    } )
 } )
 describe( 'Tools', function() {
-   
+   var returnThreeCards
+   var returnAThree
+   var age3Card = 'Alchemy'
+   beforeEach( function() {
+      initGame( [
+                  {
+                     hand: [ age3Card, "Agriculture", "Archery" ],
+                  }
+               ]
+      )
+      var card = cards[ 'Tools' ]
+      return3Cards = card.dogmas()[ 0 ].execute
+      returnAThree = card.dogmas()[ 1 ].execute
+   } )
+   it( 'Return 3 cards', function() {
+      return3Cards( game, player1 )
+      expect( player1.reaction ).to.be.not.null()
+      expect( player1.reaction.list.length ).to.equal( 3 )
+      expect( player1.reaction.callback( player1.hand.slice() ) ).to.be.true
+      expect( player1.hand.length ).to.equal( 0 )
+      // Add all stack lengths of board together, should equal 1
+      expect( player1.board.length() ).to.equal( 1 )
+      // Check if card melded is a 3
+      for( var i = new types.ColorIterator(); i.valid(); i.next() ) {
+         var cards = player1.board[ i.value() ].cards
+         if( cards.length > 0) {
+            expect( cards[ 0 ].age ).to.equal( 3 )
+         }
+      }
+   } )
+   it( 'Return less than 3 cards', function() {
+      return3Cards( game, player1 )
+      returnCards = player1.hand.slice()
+      // [ "Ag", "Arch" ]
+      expect( player1.reaction.callback( returnCards.slice( 1 ) ) ).to.be.true
+      // No 3 melded
+      expect( player1.board.length() ).to.equal( 0 )
+
+   } )
+   it( 'Return no cards', function() {
+      return3Cards( game, player1 )
+      expect( player1.reaction.callback( [] ) ).to.be.false
+   } )
+   it( 'Have no cards', function() {
+      player1.hand = []
+      var res = return3Cards( game, player1 )
+      expect( player1.reaction ).to.be.null
+      expect( res ).to.be.false
+   } )
+   it( 'Return a 3', function() {
+      returnAThree( game, player1 )
+      expect( player1.reaction ).to.not.be.null
+      expect( player1.reaction.list.length ).to.equal( 2 )
+      expect( player1.reaction.callback( cards[ age3Card ] ) ).to.be.true
+      expect( player1.hand.length ).to.equal( 5 )
+      for( var i = 0; i < player1.hand.length; i++ ) {
+         expect( player1.hand[ i ].age ).to.equal( 1 )
+      }
+   } )
+   it( 'Choose not to return', function() {
+      returnAThree( game, player1 )
+      expect( player1.reaction ).to.not.be.null
+      expect( player1.reaction.callback( null ) ).to.be.false
+      expect( player1.hand.length ).to.equal( 3 )
+
+   } )
+   it( 'Have no threes', function() {
+      player1.hand = []
+      expect( returnAThree( game, player1 ) ).to.be.false
+      expect( player1.reaction ).to.be.null
+   } )
 } )
 describe( 'Writing', function() {
    var dogma
