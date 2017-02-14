@@ -539,3 +539,26 @@ describe( 'Writing', function() {
       expect( ret ).to.be.true
    } )
 } )
+describe( "Calendar", function() {
+   var dogma
+   beforeEach( function() {
+      var card = cards[ "Calendar" ]
+      dogma = card.dogmas()[ 0 ].execute
+      player1.hand = []
+   } )
+   it( "More cards in hand than score pile", function() {
+      player1.hand.push( game.agePiles[ 0 ].pop() )
+      var ret = dogma( game, player1 )
+      // Nothing should happen
+      expect( player1.hand.length ).to.equal( 1 )
+      expect( ret ).to.be.false
+   } )
+   it( "More cards in score pile than hand", function() {
+      player1.scoreCards.push( game.agePiles[ 0 ].pop() )
+      var ret = dogma( game, player1 )
+      expect( player1.hand.length ).to.equal( 2 )
+      expect( player1.hand[ 0 ].age ).to.equal( 3 )
+      expect( player1.hand[ 1 ].age ).to.equal( 3 )
+      expect( ret ).to.be.true
+   } )
+} )

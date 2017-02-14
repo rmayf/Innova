@@ -473,6 +473,22 @@ var writingDogmas = function() {
    ]
 }
 
+var calendarDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            if( player.scoreCards.length > player.hand.length ) {
+               game.draw( player, 3 )
+               game.draw( player, 3 )
+               return true
+            }
+            return false
+         }
+      }
+   ]
+}
+
 var cards = {
       "Agriculture": new Card( "Agriculture", 1, types.Yellow, types.Hex, types.Leaf,
                             types.Leaf, types.Leaf, types.Leaf, AgricultureDogmas ),
@@ -505,7 +521,7 @@ var cards = {
                        types.Castle, types.Lightbulb, toolsDogmas ),
       "Writing": new Card( "Writing", 1, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb,
                          types.Crown, types.Lightbulb, writingDogmas ),
-      "Calendar": new Card( "Calendar", 2, types.Blue, types.Hex, types.Leaf, types.Leaf, types.Lightbulb, types.Leaf, [  function() {} ] ),
+      "Calendar": new Card( "Calendar", 2, types.Blue, types.Hex, types.Leaf, types.Leaf, types.Lightbulb, types.Leaf, calendarDogmas ),
       "Canal Building": new Card( "Canal Building", 2, types.Yellow, types.Hex, types.Crown, types.Leaf, types.Crown, types.Crown, [  function() {} ] ) ,
       "Currency": new Card( "Currency", 2, types.Green, types.Leaf, types.Crown, types.Hex, types.Crown, types.Crown, [  function() {} ] ) ,
       "Construction": new Card( "Construction", 2, types.Red, types.Castle, types.Hex, types.Castle, types.Castle, types.Castle, [  function() {} ] ) ,
