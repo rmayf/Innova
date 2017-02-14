@@ -147,6 +147,16 @@ describe( 'Game', function() {
          expect( res[ 0 ] ).to.equal( ag )
       } )
    } )
+   describe( 'exchange', function() {
+      it( 'arrays', function() {
+         var lsA = [ 1, 2, 3 ]
+         var lsB = [ 5, 6, 7 ]
+         game.exchange( function( x ) { return x == 2 }, lsA,
+                        function( x ) { return x <=6 }, lsB )
+         expect( lsA.length ).to.equal( 4 )
+         expect( lsB.length ).to.equal( 2 )
+      } )
+   } )
    describe( 'toJSON', function() {
       it( 'aoeu', function() {
          JSON.parse( game.serialize( 'bob' ) )

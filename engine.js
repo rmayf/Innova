@@ -537,18 +537,27 @@ exports.Game = function( numPlayers, numAchievements, callback ) {
       var split = function( fn, ls ) {
          // removes elements for which fn( elem ) is true
          // returns list of removed elements
-         matches = [];
+         var matches = []
          for( var i = 0; i < ls.length; i++ ) {
             if( fn( ls[ i ] ) ) {
-               matches.concat( ls.splice( i, 1 ) );
-               i--;
+               matches.push( ls.splice( i, 1 )[ 0 ] )
+               i--
             }
          }
-         return matches;
+         return matches
       }
-      matchesA = split( fnA, lsA );
-      lsA.concat( split( fnB, lsB ) );
-      lsB.concat( matchesA );
+      var matchesA = split( fnA, lsA )
+      var lenA = matchesA.length
+      var matchesB = split( fnB, lsB )
+      var lenB = matchesB.length
+      for( var i = 0; i < lenB; i++ ) {
+         lsA.push( matchesB.pop() )
+      }
+      for( var i = 0; i < lenA; i++ ) {
+         lsB.push( matchesA.pop() )
+      }
+      console.log( lsA )
+      console.log( lsB )
    };
    this.transfer = function( txPlayer, txCards, txSrc, rxPlayer, rxSrc ) {
       for( var i = 0; i < txCards.length; i++ ) {

@@ -562,3 +562,44 @@ describe( "Calendar", function() {
       expect( ret ).to.be.true
    } )
 } )
+describe( "Canal Building", function() {
+   var dogma
+   beforeEach( function() {
+      var card = cards[ "Canal Building" ]
+      dogma = card.dogmas()[ 0 ].execute
+      player1.hand = []
+   } )
+   it( "Does exchange", function() {
+      var highestAgeInHand = 5
+      var highestAgeInScore = 7
+      player1.hand.push( game.agePiles[ highestAgeInHand ].pop() )
+      player1.hand.push( game.agePiles[ highestAgeInHand ].pop() )
+      player1.hand.push( game.agePiles[ 0 ].pop() )
+      player1.hand.push( game.agePiles[ 1 ].pop() )
+      player1.scoreCards.push( game.agePiles[ 2 ].pop() )
+      player1.scoreCards.push( game.agePiles[ highestAgeInScore ].pop() )
+      player1.scoreCards.push( game.agePiles[ highestAgeInScore ].pop() )
+      player1.scoreCards.push( game.agePiles[ highestAgeInScore ].pop() )
+      dogma( game, player1 ) 
+      expect( player1.reaction ).to.be.not.null()
+      expect( player1.reaction.list.length ).to.equal( 2 )
+      expect( player1.reaction.callback( true ) ).to.be.true
+      expect( player1.hand.length ).to.equal( 5 )
+      expect( player1.scoreCards.length ).to.equal( 3 )
+
+   } )
+   it( "Nothing in hand or score pile", function() {
+      var ret = dogma( game, player1 ) 
+      expect( ret ).to.be.false
+   } )
+   it( "Does not exchange", function() {
+      player1.hand.push( game.agePiles[ 0 ].pop() )
+      dogma( game, player1 ) 
+      expect( player1.reaction ).to.be.not.null()
+      expect( player1.reaction.list.length ).to.equal( 2 )
+      expect( player1.reaction.callback( false ) ).to.be.false
+      // Nothing should change
+      expect( player1.hand.length ).to.equal( 1 )
+      expect( player1.scoreCards ).to.be.empty
+   } )
+} )

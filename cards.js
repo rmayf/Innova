@@ -488,6 +488,39 @@ var calendarDogmas = function() {
       }
    ]
 }
+var canalBuildingDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            if( player.hand.length == 0 && player.scoreCards.length == 0 ) {
+               // Don't offer a choice because it doesn't matter
+               // because nothing will change
+               return false
+            }
+            // Offer a choice
+            player.reaction = new types.Reaction( 1, [ true, false ], translateBoolean, function( ans ) {
+               var _highestAgeFilter = function( ls ) {
+                  var highestAge = 1
+                  for( var i = 0; i < ls.length; i++ ) {
+                     if( ls[ i ].age > highestAge ) {
+                        highestAge = ls[ i ].age
+                     }
+                  }
+                  return function( card ) {
+                     return card.age == highestAge
+                  }
+               }
+               if( ans ) {
+                  game.exchange( _highestAgeFilter( player.hand ), player.hand, _highestAgeFilter( player.scoreCards ), player.scoreCards )
+                  return true
+               }
+               return false
+            } )
+         }
+      }
+   ]
+}
 
 var cards = {
       "Agriculture": new Card( "Agriculture", 1, types.Yellow, types.Hex, types.Leaf,
@@ -522,7 +555,7 @@ var cards = {
       "Writing": new Card( "Writing", 1, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb,
                          types.Crown, types.Lightbulb, writingDogmas ),
       "Calendar": new Card( "Calendar", 2, types.Blue, types.Hex, types.Leaf, types.Leaf, types.Lightbulb, types.Leaf, calendarDogmas ),
-      "Canal Building": new Card( "Canal Building", 2, types.Yellow, types.Hex, types.Crown, types.Leaf, types.Crown, types.Crown, [  function() {} ] ) ,
+      "Canal Building": new Card( "Canal Building", 2, types.Yellow, types.Hex, types.Crown, types.Leaf, types.Crown, types.Crown, canalBuildingDogmas ) ,
       "Currency": new Card( "Currency", 2, types.Green, types.Leaf, types.Crown, types.Hex, types.Crown, types.Crown, [  function() {} ] ) ,
       "Construction": new Card( "Construction", 2, types.Red, types.Castle, types.Hex, types.Castle, types.Castle, types.Castle, [  function() {} ] ) ,
       "Fermenting": new Card( "Fermenting", 2, types.Yellow, types.Leaf, types.Leaf, types.Hex, types.Castle, types.Leaf, [  function() {} ] ) ,
