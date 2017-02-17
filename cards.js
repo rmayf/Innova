@@ -521,6 +521,42 @@ var canalBuildingDogmas = function() {
       }
    ]
 }
+var currencyDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            if( player.hand.length == 0 ) {
+               return false
+            }
+            player.reaction = new types.Reaction( "<=" + player.hand.length, player.hand,
+                                                  translateCardList, function( cardsToReturn ) {
+               if( cardsToReturn.length == 0 ) {
+                  return false
+               }
+               var uniqueAges = []
+               for( var i = 0; i < cardsToReturn.length; i++ ) {
+                  var card = cardsToReturn[ i ]
+                  var j
+                  for( j = 0; j < uniqueAges.length; j++ ) {
+                     if( uniqueAges[ j ] == card.age ) {
+                        break
+                     }
+                  }
+                  if( j == uniqueAges.length ) {
+                     uniqueAges.push( card.age )
+                  }
+                  game.return( player, card )
+               }
+               for( var i = 0; i < uniqueAges.length; i++ ) {
+                  game.score( player, game.drawReturn( 2 ) )
+               }
+               return true
+            } )
+         }
+      }
+   ]
+}
 
 var cards = {
       "Agriculture": new Card( "Agriculture", 1, types.Yellow, types.Hex, types.Leaf,
@@ -551,12 +587,15 @@ var cards = {
       "The Wheel": new Card( "The Wheel", 1, types.Green, types.Hex, types.Castle,
                              types.Castle, types.Castle, types.Castle, theWheelDogmas ),
       "Tools": new Card( "Tools", 1, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb,
-                       types.Castle, types.Lightbulb, toolsDogmas ),
+                         types.Castle, types.Lightbulb, toolsDogmas ),
       "Writing": new Card( "Writing", 1, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb,
-                         types.Crown, types.Lightbulb, writingDogmas ),
-      "Calendar": new Card( "Calendar", 2, types.Blue, types.Hex, types.Leaf, types.Leaf, types.Lightbulb, types.Leaf, calendarDogmas ),
-      "Canal Building": new Card( "Canal Building", 2, types.Yellow, types.Hex, types.Crown, types.Leaf, types.Crown, types.Crown, canalBuildingDogmas ) ,
-      "Currency": new Card( "Currency", 2, types.Green, types.Leaf, types.Crown, types.Hex, types.Crown, types.Crown, [  function() {} ] ) ,
+                           types.Crown, types.Lightbulb, writingDogmas ),
+      "Calendar": new Card( "Calendar", 2, types.Blue, types.Hex, types.Leaf, types.Leaf,
+                            types.Lightbulb, types.Leaf, calendarDogmas ),
+      "Canal Building": new Card( "Canal Building", 2, types.Yellow, types.Hex, types.Crown,
+                                  types.Leaf, types.Crown, types.Crown, canalBuildingDogmas ),
+      "Currency": new Card( "Currency", 2, types.Green, types.Leaf, types.Crown, types.Hex,
+                            types.Crown, types.Crown, currencyDogmas ),
       "Construction": new Card( "Construction", 2, types.Red, types.Castle, types.Hex, types.Castle, types.Castle, types.Castle, [  function() {} ] ) ,
       "Fermenting": new Card( "Fermenting", 2, types.Yellow, types.Leaf, types.Leaf, types.Hex, types.Castle, types.Leaf, [  function() {} ] ) ,
       "Mapmaking": new Card( "Mapmaking", 2, types.Green, types.Hex, types.Crown, types.Crown, types.Castle, types.Crown, [  function() {} ] ) ,

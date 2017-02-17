@@ -581,7 +581,7 @@ describe( "Canal Building", function() {
       player1.scoreCards.push( game.agePiles[ highestAgeInScore ].pop() )
       player1.scoreCards.push( game.agePiles[ highestAgeInScore ].pop() )
       dogma( game, player1 ) 
-      expect( player1.reaction ).to.be.not.null()
+      expect( player1.reaction ).to.be.not.null
       expect( player1.reaction.list.length ).to.equal( 2 )
       expect( player1.reaction.callback( true ) ).to.be.true
       expect( player1.hand.length ).to.equal( 5 )
@@ -595,11 +595,45 @@ describe( "Canal Building", function() {
    it( "Does not exchange", function() {
       player1.hand.push( game.agePiles[ 0 ].pop() )
       dogma( game, player1 ) 
-      expect( player1.reaction ).to.be.not.null()
+      expect( player1.reaction ).to.be.not.null
       expect( player1.reaction.list.length ).to.equal( 2 )
       expect( player1.reaction.callback( false ) ).to.be.false
       // Nothing should change
       expect( player1.hand.length ).to.equal( 1 )
+      expect( player1.scoreCards ).to.be.empty
+   } )
+} )
+describe( "Currency", function() {
+   var dogma
+   beforeEach( function() {
+      var card = cards[ "Currency" ]
+      dogma = card.dogmas()[ 0 ].execute
+      player1.hand = []
+   } )
+   it( "nothing in hand", function() {
+      var ret = dogma( game, player1 )
+      expect( ret ).to.be.false
+   } )
+   it( "chooses to return", function() {
+      var cardsToReturn = []
+      cardsToReturn.push( game.agePiles[ 0 ].pop() )
+      cardsToReturn.push( game.agePiles[ 0 ].pop() )
+      cardsToReturn.push( game.agePiles[ 3 ].pop() )
+      player1.hand = player1.hand.concat( cardsToReturn )
+      player1.hand.push( game.agePiles[ 5 ].pop() )
+      dogma( game, player1 )
+      console.log( player1.reaction.list )
+      expect( player1.reaction.list.length ).to.equal( 4 )
+      expect( player1.reaction.callback( cardsToReturn ) ).to.be.true
+      expect( player1.hand.length ).to.equal( 1 )
+      expect( player1.scoreCards.length ).to.equal( 2 )
+      expect( player1.scoreCards[ 0 ].age ).to.equal( 2 )
+   } )
+   it( "Doesn't return anything", function() {
+      player1.hand.push( game.agePiles[ 0 ].pop() )
+      dogma( game, player1 )
+      expect( player1.reaction ).to.be.not.null
+      expect( player1.reaction.callback( [] ) ).to.be.false
       expect( player1.scoreCards ).to.be.empty
    } )
 } )
