@@ -557,6 +557,56 @@ var currencyDogmas = function() {
       }
    ]
 }
+var constructionDogmas = function() {
+   return [
+      {
+         demand: true,
+         execute: function( game, caller, callee ) {
+            if( callee.hand.length > 2 ) {
+               // Callee selects 2 cards from hand to xfer
+               callee.reaction = new types.Reaction( 2, callee.hand, translateCardList,
+                                                     function( cardList ) {
+                  // Xfer 2 cards from calle hand to caller hand
+                  game.transfer( callee, cardList, callee.hand, caller, caller.hand )
+                  game.draw( callee, 2 )
+               } )
+            } else {
+               game.transfer( callee, callee.hand, callee.hand, caller, caller.hand )
+               game.draw( callee, 2 )
+            }
+         }
+      },
+      {
+         demand: false,
+         execute: function( game, player ) {
+            var allTopCards = function( board ) {
+               var i
+               for( i = 0; i < 5; i++ ) {
+                  if( board[ i ].cards.length == 0 ) {
+                     break
+                  }
+               }
+               return i == 5
+            }
+            if( allTopCards( player.board ) ) {
+               var i
+               for( i = 0; i < game.players.length; i++ ) {
+                  if( game.players[ i ] != player ) {
+                     if( allTopCards( game.players[ i ].board ) ) {
+                        break
+                     }
+                  }
+               }
+               if( i == game.players.length ) {
+                  game.doAchieve( player, types.Empire )
+                  return true
+               }
+            }
+            return false
+         }
+      }
+   ]
+}
 
 var cards = {
       "Agriculture": new Card( "Agriculture", 1, types.Yellow, types.Hex, types.Leaf,
@@ -596,7 +646,8 @@ var cards = {
                                   types.Leaf, types.Crown, types.Crown, canalBuildingDogmas ),
       "Currency": new Card( "Currency", 2, types.Green, types.Leaf, types.Crown, types.Hex,
                             types.Crown, types.Crown, currencyDogmas ),
-      "Construction": new Card( "Construction", 2, types.Red, types.Castle, types.Hex, types.Castle, types.Castle, types.Castle, [  function() {} ] ) ,
+      "Construction": new Card( "Construction", 2, types.Red, types.Castle, types.Hex, types.Castle,
+                                types.Castle, types.Castle, constructionDogmas ),
       "Fermenting": new Card( "Fermenting", 2, types.Yellow, types.Leaf, types.Leaf, types.Hex, types.Castle, types.Leaf, [  function() {} ] ) ,
       "Mapmaking": new Card( "Mapmaking", 2, types.Green, types.Hex, types.Crown, types.Crown, types.Castle, types.Crown, [  function() {} ] ) ,
       "Mathematics": new Card( "Mathematics", 2, types.Blue, types.Hex, types.Lightbulb, types.Crown, types.Lightbulb, types.Lightbulb, [  function() {} ] ) ,

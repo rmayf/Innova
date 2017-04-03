@@ -622,7 +622,6 @@ describe( "Currency", function() {
       player1.hand = player1.hand.concat( cardsToReturn )
       player1.hand.push( game.agePiles[ 5 ].pop() )
       dogma( game, player1 )
-      console.log( player1.reaction.list )
       expect( player1.reaction.list.length ).to.equal( 4 )
       expect( player1.reaction.callback( cardsToReturn ) ).to.be.true
       expect( player1.hand.length ).to.equal( 1 )
@@ -635,5 +634,61 @@ describe( "Currency", function() {
       expect( player1.reaction ).to.be.not.null
       expect( player1.reaction.callback( [] ) ).to.be.false
       expect( player1.scoreCards ).to.be.empty
+   } )
+} )
+describe( "Construction", function() {
+   var demand
+   var checkEmpire
+   beforeEach( function() {
+      initGame( [ 
+         {
+            hand: [],
+            board: [ "Construction", "Tools", "Domestication", "Code of Laws" ],
+         },
+         {
+            hand: [ "Mapmaking" ],
+            board: [ "Clothing", "Pottery", "City States", "Agriculture" ],
+         }
+      ] )
+      var card = cards[ "Construction" ]
+      demand = card.dogmas()[ 0 ].execute
+      checkEmpire = card.dogmas()[ 1 ].execute
+   } )
+   it( "callee has more than 2", function() {
+      var mysticism = cards[ "Mysticism" ]
+      var writing = cards[ "Writing" ]
+      player2.hand.push( mysticism )
+      player2.hand.push( writing )
+      demand( game, player1, player2 )
+      expect( player2.reaction ).to.not.be.null
+      expect( player2.reaction.n ).to.equal( 2 )
+      player2.reaction.callback( [ mysticism, writing ] )
+      expect( player1.hand.length ).to.equal( 2 )
+      // Callee draws a 2
+      expect( player2.hand.length ).to.equal( 2 )
+   } )
+   it( "callee has less than 2", function() {
+      demand( game, player1, player2 )
+      // Callee has no option since less than 2 cards in hand
+      expect( player2.reaction ).to.be.null
+      expect( player1.hand.length ).to.equal( 1 )
+      expect( player2.hand.length ).to.equal( 1 )
+
+   } )
+   it( "caller doesn't have 5 top cards", function() {
+      checkEmpire( game, player1 )
+      expect( player1.achievements.length ).to.equal( 0 )
+
+   } )
+   it( "Caller has 5 top cards, noone eles does", function() {
+      game.meld( player1, cards[ "Paper" ] )
+      console.log( player1 )
+      checkEmpire( game, player1 )
+      expect( player1.achievements.length ).to.equal( 1 )
+   } )
+   it( "Caller has 5 top cards, so does someone else", function() {
+      game.meld( player1, cards[ "Paper" ] )
+      game.meld( player2, cards[ "Gunpowder" ] )
+      expect( player1.achievements.length ).to.equal( 0 )
    } )
 } )
