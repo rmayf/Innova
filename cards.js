@@ -615,10 +615,32 @@ var fermentingDogmas = function() {
             for( var leafs = player.symbolCount()[ types.Leaf ] / 2; leafs >= 1; leafs-- ) {
                game.draw( player, 2 ) 
             }
+            return player.symbolCount()[ types.Leaf ] >= 2
          }
       }
    ]
-} 
+}
+var mathematicsDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            if( player.hand.length != 0 ) {
+               player.reaction = new types.Reaction( "<=1", player.hand, translateCard,
+                                                     function( card ) {
+                  if( card != null ) {
+                     game.return( player, card )
+                     game.meld( player, game.drawReturn( card.age + 1 ) )
+                     return true
+                  }
+                  return false
+               } )
+            }
+            return false
+         } 
+      }
+   ]
+}
 
 var cards = {
       "Agriculture": new Card( "Agriculture", 1, types.Yellow, types.Hex, types.Leaf,
@@ -663,7 +685,9 @@ var cards = {
       "Fermenting": new Card( "Fermenting", 2, types.Yellow, types.Leaf, types.Leaf,
                               types.Hex, types.Castle, types.Leaf, fermentingDogmas ),
       "Mapmaking": new Card( "Mapmaking", 2, types.Green, types.Hex, types.Crown, types.Crown, types.Castle, types.Crown, [  function() {} ] ) ,
-      "Mathematics": new Card( "Mathematics", 2, types.Blue, types.Hex, types.Lightbulb, types.Crown, types.Lightbulb, types.Lightbulb, [  function() {} ] ) ,
+      "Mathematics": new Card( "Mathematics", 2, types.Blue, types.Hex,
+                               types.Lightbulb, types.Crown, types.Lightbulb,
+                               types.Lightbulb, mathematicsDogmas ),
       "Monotheism": new Card( "Monotheism", 2, types.Purple, types.Hex, types.Castle, types.Castle, types.Castle, types.Castle, [  function() {} ] ) ,
       "Philosophy": new Card( "Philosophy", 2, types.Purple, types.Hex, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Lightbulb, [  function() {} ] ) ,
       "Road Building": new Card( "Road Building", 2, types.Red, types.Castle, types.Castle, types.Hex, types.Castle, types.Castle, [  function() {} ] ),

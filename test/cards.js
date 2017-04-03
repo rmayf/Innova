@@ -713,3 +713,45 @@ describe( "Fermenting", function() {
       expect( player1.hand.length ).to.equal( 2 )
    } )
 } )
+describe( "Mathematics", function() {
+   var dogma
+   var engineering = cards[ "Engineering" ]
+   beforeEach( function() {
+      initGame( [
+         {
+            hand: [ "Clothing", "Calendar" ],
+            board: []
+         }
+      ] )
+      dogma = cards[ "Mathematics" ].dogmas()[ 0 ].execute
+      game.agePiles[ 2 ] = [ engineering ]
+   } )
+   it( "no cards in hand, nothing happens", function() {
+      player1.hand = []
+      var ret = dogma( game, player1 )
+      expect( player1.hand.length ).to.equal( 0 )
+      expect( player1.board[ types.Yellow ].cards.length ).to.equal( 0 )
+      expect( player1.board[ types.Blue ].cards.length ).to.equal( 0 )
+      expect( player1.board[ types.Red ].cards.length ).to.equal( 0 )
+      expect( player1.board[ types.Green ].cards.length ).to.equal( 0 )
+      expect( player1.board[ types.Purple ].cards.length ).to.equal( 0 )
+      expect( ret ).to.be.false
+   } )
+   it( "cards in hand choose to return one", function() {
+      var ret = dogma( game, player1 ) 
+      expect( player1.reaction ).to.not.be.null
+      expect( player1.reaction.n ).to.equal( "<=1" )
+      expect( player1.reaction.list.length ).to.equal( player1.hand.length )
+      expect( ret ).to.be.false
+      ret = player1.reaction.callback( cards[ "Calendar" ] )
+      expect( ret ).to.be.true
+      expect( player1.hand.length ).to.equal( 1 )
+      expect( player1.board[ types.Red ].cards.length ).to.equal( 1 )
+   } )
+   it( "cards in hand, choose no return", function() {
+      dogma( game, player1 )
+      var ret = player1.reaction.callback( null )
+      expect( ret ).to.be.false
+      expect( player1.hand.length ).to.equal( 2 )
+   } )
+} )
