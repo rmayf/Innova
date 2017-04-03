@@ -754,3 +754,35 @@ describe( "Mathematics", function() {
       expect( player1.hand.length ).to.equal( 2 )
    } )
 } )
+describe( "Mapmaking", function() {
+   var demand
+   var dogma
+   beforeEach( function() {
+      var dogmas = cards[ "Mapmaking" ].dogmas()
+      demand = dogmas[ 0 ].execute 
+      dogma = dogmas[ 1 ].execute 
+      player2.reaction = null
+   } )
+   it( "callee has no 1's in score pile", function() {
+      game.score( player2, cards[ "Engineering" ] )
+      demand( game, player1, player2 )
+      expect( player2.reaction ).to.be.null
+      expect( player1.score.length ).to.equal( 0 )
+      var ret = dogma( game, player1 )
+      expect( ret ).to.be.false
+   } )
+   it( "calle chooses 1 from score pile", function() {
+      game.score( player2, cards[ "Agriculture" ] ) 
+      game.score( player2, cards[ "Domestication" ] )
+      game.score( player2, cards[ "Engineering" ] )
+      demand( game, player1, player2 )
+      expect( player2.reaction ).to.not.be.null
+      expect( player2.reaction.n ).to.equal( 1 )
+      expect( player2.reaction.list.length ).to.equal( 2 )
+      player2.reaction.callback( cards[ "Agriculture" ] )
+      var ret = dogma( game, player1 )
+      expect( ret ).to.be.true
+      expect( player2.scoreCards.length ).to.equal( 2 )
+      expect( player1.scoreCards.length ).to.equal( 2 )
+   } )
+} )

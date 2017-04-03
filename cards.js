@@ -642,7 +642,34 @@ var mathematicsDogmas = function() {
    ]
 }
 var mapmakingDogmas = function() {
+   var cardXferd = false
    return [
+      {
+         demand: true,
+         execute: function( game, caller, callee ) {
+            var ageOnes = []
+            for( var i = 0; i < callee.scoreCards.length; i++ ) {
+               if( callee.scoreCards[ i ].age == 1 ) {
+                  ageOnes.push( callee.scoreCards[ i ] )
+               }
+            }
+            if( ageOnes.length > 0 ) {
+               callee.reaction = new types.Reaction( 1, ageOnes, translateCard, function( card ) {
+                  game.transfer( callee, [ card ], callee.scoreCards, caller, caller.scoreCards )
+                  cardXferd = true
+               } )
+            }
+         }
+      },
+      {
+         demand: false,
+         execute: function( game, player ) {
+            if( cardXferd ) {
+               game.score( player, game.drawReturn( 1 ) )
+            }
+            return cardXferd
+         } 
+      }
    ]
 }
 var monotheismDogmas = function() {
