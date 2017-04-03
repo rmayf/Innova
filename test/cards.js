@@ -692,3 +692,24 @@ describe( "Construction", function() {
       expect( player1.achievements.length ).to.equal( 0 )
    } )
 } )
+describe( "Fermenting", function() {
+   var dogma
+   beforeEach( function() {
+      initGame( [
+         {
+            hand: [],
+            board: [ "Clothing" ],
+         }
+      ] )
+      dogma = cards[ "Fermenting" ].dogmas()[ 0 ].execute
+   } )
+   it( "draws 2 for each leaf, even", function() {
+      dogma( game, player1 )
+      expect( player1.hand.length ).to.equal( 1 )
+   } )
+   it( "draws 2 for each leaf, rounds down", function() {
+      game.meld( player1, cards[ "Pottery" ] )
+      dogma( game, player1 )
+      expect( player1.hand.length ).to.equal( 2 )
+   } )
+} )

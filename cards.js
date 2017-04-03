@@ -607,6 +607,18 @@ var constructionDogmas = function() {
       }
    ]
 }
+var fermentingDogmas = function() {
+   return [
+      {
+         demand: false,
+         execute: function( game, player ) {
+            for( var leafs = player.symbolCount()[ types.Leaf ] / 2; leafs >= 1; leafs-- ) {
+               game.draw( player, 2 ) 
+            }
+         }
+      }
+   ]
+} 
 
 var cards = {
       "Agriculture": new Card( "Agriculture", 1, types.Yellow, types.Hex, types.Leaf,
@@ -648,7 +660,8 @@ var cards = {
                             types.Crown, types.Crown, currencyDogmas ),
       "Construction": new Card( "Construction", 2, types.Red, types.Castle, types.Hex, types.Castle,
                                 types.Castle, types.Castle, constructionDogmas ),
-      "Fermenting": new Card( "Fermenting", 2, types.Yellow, types.Leaf, types.Leaf, types.Hex, types.Castle, types.Leaf, [  function() {} ] ) ,
+      "Fermenting": new Card( "Fermenting", 2, types.Yellow, types.Leaf, types.Leaf,
+                              types.Hex, types.Castle, types.Leaf, fermentingDogmas ),
       "Mapmaking": new Card( "Mapmaking", 2, types.Green, types.Hex, types.Crown, types.Crown, types.Castle, types.Crown, [  function() {} ] ) ,
       "Mathematics": new Card( "Mathematics", 2, types.Blue, types.Hex, types.Lightbulb, types.Crown, types.Lightbulb, types.Lightbulb, [  function() {} ] ) ,
       "Monotheism": new Card( "Monotheism", 2, types.Purple, types.Hex, types.Castle, types.Castle, types.Castle, types.Castle, [  function() {} ] ) ,
