@@ -682,7 +682,6 @@ describe( "Construction", function() {
    } )
    it( "Caller has 5 top cards, noone eles does", function() {
       game.meld( player1, cards[ "Paper" ] )
-      console.log( player1 )
       checkEmpire( game, player1 )
       expect( player1.achievements.length ).to.equal( 1 )
    } )

@@ -556,8 +556,6 @@ exports.Game = function( numPlayers, numAchievements, callback ) {
       for( var i = 0; i < lenA; i++ ) {
          lsB.push( matchesA.pop() )
       }
-      console.log( lsA )
-      console.log( lsB )
    };
    this.transfer = function( txPlayer, txCards, txSrc, rxPlayer, rxSrc ) {
       for( var i = 0; i < txCards.length; i++ ) {

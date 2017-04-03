@@ -641,6 +641,342 @@ var mathematicsDogmas = function() {
       }
    ]
 }
+var mapmakingDogmas = function() {
+   return [
+   ]
+}
+var monotheismDogmas = function() {
+   return [
+   ]
+}
+var philosophyDogmas = function() {
+   return [
+   ]
+}
+var roadBulidingDogmas = function() {
+   return [
+   ]
+}
+var alchemyDogmas = function() {
+   return [
+   ]
+}
+var compassDogmas = function() {
+   return [
+   ]
+}
+var educationDogmas = function() {
+   return [
+   ]
+}
+var engineeringDogmas = function() {
+   return [
+   ]
+}
+var feudalismDogmas = function() {
+   return [
+   ]
+}
+var machineryDogmas = function() {
+   return [
+   ]
+}
+var medicineDogmas = function() {
+   return [
+   ]
+}
+var opticsDogmas = function() {
+   return [
+   ]
+}
+var paperDogmas = function() {
+   return [
+   ]
+}
+var translationDogmas = function() {
+   return [
+   ]
+}
+var anatomyDogmas = function() {
+   return [
+   ]
+}
+var colonialismDogmas = function() {
+   return [
+   ]
+}
+var enterpriseDogmas = function() {
+   return [
+   ]
+}
+var experimentationDogmas = function() {
+   return [
+   ]
+}
+var gunpowderDogmas = function() {
+   return [
+   ]
+}
+var inventionDogmas = function() {
+   return [
+   ]
+}
+var navigationDogmas = function() {
+   return [
+   ]
+}
+var perspectiveDogmas = function() {
+   return [
+   ]
+}
+var printingPressDogmas = function() {
+   return [
+   ]
+}
+var reformationDogmas = function() {
+   return [
+   ]
+}
+var astronomyDogmas = function() {
+   return [
+   ]
+}
+var bankingDogmas = function() {
+   return [
+   ]
+}
+var chemistryDogmas = function() {
+   return [
+   ]
+}
+var coalDogmas = function() {
+   return [
+   ]
+}
+var measurementDogmas = function() {
+   return [
+   ]
+}
+var physicsDogmas = function() {
+   return [
+   ]
+}
+var societiesDogmas = function() {
+   return [
+   ]
+}
+var statisticsDogmas = function() {
+   return [
+   ]
+}
+var steamEngineDogmas = function() {
+   return [
+   ]
+}
+var thePirateCodeDogmas = function() {
+   return [
+   ]
+}
+var atomicTheoryDogmas = function() {
+   return [
+   ]
+}
+var canningDogmas = function() {
+   return [
+   ]
+}
+var classificationDogmas = function() {
+   return [
+   ]
+}
+var democracyDogmas = function() {
+   return [
+   ]
+}
+var emancipationDogmas = function() {
+   return [
+   ]
+}
+var encyclopediaDogmas = function() {
+   return [
+   ]
+}
+var industrializationDogmas = function() {
+   return [
+   ]
+}
+var machineToolsDogmas = function() {
+   return [
+   ]
+}
+var metricSystemDogmas = function() {
+   return [
+   ]
+}
+var vaccinationDogmas = function() {
+   return [
+   ]
+}
+var bicycleDogmas = function() {
+   return [
+   ]
+}
+var combustionDogmas = function() {
+   return [
+   ]
+}
+var electricityDogmas = function() {
+   return [
+   ]
+}
+var evolutionDogmas = function() {
+   return [
+   ]
+}
+var explosivesDogmas = function() {
+   return [
+   ]
+}
+var lightingDogmas = function() {
+   return [
+   ]
+}
+var publicationsDogmas = function() {
+   return [
+   ]
+}
+var railroadDogmas = function() {
+   return [
+   ]
+}
+var refrigerationDogmas = function() {
+   return [
+   ]
+}
+var sanitationDogmas = function() {
+   return [
+   ]
+}
+var antibioticsDogmas = function() {
+   return [
+   ]
+}
+var corporationsDogmas = function() {
+   return [
+   ]
+}
+var empiricismDogmas = function() {
+   return [
+   ]
+}
+var flightDogmas = function() {
+   return [
+   ]
+}
+var massMediaDogmas = function() {
+   return [
+   ]
+}
+var mobilityDogmas = function() {
+   return [
+   ]
+}
+var quantumTheoryDogmas = function() {
+   return [
+   ]
+}
+var rocketryDogmas = function() {
+   return [
+   ]
+}
+var skyscrapersDogmas = function() {
+   return [
+   ]
+}
+var socialismDogmas = function() {
+   return [
+   ]
+}
+var collaborationDogmas = function() {
+   return [
+   ]
+}
+var compositesDogmas = function() {
+   return [
+   ]
+}
+var computersDogmas = function() {
+   return [
+   ]
+}
+var ecologyDogmas = function() {
+   return [
+   ]
+}
+var fissionDogmas = function() {
+   return [
+   ]
+}
+var geneticsDogmas = function() {
+   return [
+   ]
+}
+var satellitesDogmas = function() {
+   return [
+   ]
+}
+var servicesDogmas = function() {
+   return [
+   ]
+}
+var specializationDogmas = function() {
+   return [
+   ]
+}
+var suburbiaDogmas = function() {
+   return [
+   ]
+}
+var aiDogmas = function() {
+   return [
+   ]
+}
+var bioengineeringDogmas = function() {
+   return [
+   ]
+}
+var databasesDogmas = function() {
+   return [
+   ]
+}
+var globalizationDogmas = function() {
+   return [
+   ]
+}
+var miniaturizationDogmas = function() {
+   return [
+   ]
+}
+var roboticsDogmas = function() {
+   return [
+   ]
+}
+var selfServiceDogmas = function() {
+   return [
+   ]
+}
+var softwareDogmas = function() {
+   return [
+   ]
+}
+var stemCellsDogmas = function() {
+   return [
+   ]
+}
+var theInternetDogmas = function() {
+   return [
+   ]
+}
 
 var cards = {
       "Agriculture": new Card( "Agriculture", 1, types.Yellow, types.Hex, types.Leaf,
@@ -684,92 +1020,92 @@ var cards = {
                                 types.Castle, types.Castle, constructionDogmas ),
       "Fermenting": new Card( "Fermenting", 2, types.Yellow, types.Leaf, types.Leaf,
                               types.Hex, types.Castle, types.Leaf, fermentingDogmas ),
-      "Mapmaking": new Card( "Mapmaking", 2, types.Green, types.Hex, types.Crown, types.Crown, types.Castle, types.Crown, [  function() {} ] ) ,
+      "Mapmaking": new Card( "Mapmaking", 2, types.Green, types.Hex, types.Crown, types.Crown, types.Castle, types.Crown, mapmakingDogmas ),
       "Mathematics": new Card( "Mathematics", 2, types.Blue, types.Hex,
                                types.Lightbulb, types.Crown, types.Lightbulb,
                                types.Lightbulb, mathematicsDogmas ),
-      "Monotheism": new Card( "Monotheism", 2, types.Purple, types.Hex, types.Castle, types.Castle, types.Castle, types.Castle, [  function() {} ] ) ,
-      "Philosophy": new Card( "Philosophy", 2, types.Purple, types.Hex, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Lightbulb, [  function() {} ] ) ,
-      "Road Building": new Card( "Road Building", 2, types.Red, types.Castle, types.Castle, types.Hex, types.Castle, types.Castle, [  function() {} ] ),
-      "Alchemy": new Card( "Alchemy", 3, types.Blue, types.Hex, types.Leaf, types.Castle, types.Castle, types.Castle, [  function() {} ] ) ,
-      "Compass": new Card( "Compass", 3, types.Green, types.Hex, types.Crown, types.Crown, types.Leaf, types.Crown, [  function() {} ] ) ,
-      "Education": new Card( "Education", 3, types.Purple, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, [  function() {} ] ) ,
-      "Engineering": new Card( "Engineering", 3, types.Red, types.Castle, types.Hex, types.Lightbulb, types.Castle, types.Castle, [  function() {} ] ) ,
-      "Feudalism": new Card( "Feudalism", 3, types.Purple, types.Hex, types.Castle, types.Leaf, types.Castle, types.Castle, [  function() {} ] ) ,
-      "Machinery": new Card( "Machinery", 3, types.Yellow, types.Leaf, types.Leaf, types.Hex, types.Castle, types.Leaf, [  function() {} ] ) ,
-      "Medicine": new Card( "Medicine", 3, types.Yellow, types.Crown, types.Leaf, types.Leaf, types.Hex, types.Leaf, [  function() {} ] ) ,
-      "Optics": new Card( "Optics", 3, types.Red, types.Crown, types.Crown, types.Crown, types.Hex, types.Crown, [  function() {} ] ) ,
-      "Paper": new Card( "Paper", 3, types.Green, types.Hex, types.Lightbulb, types.Lightbulb, types.Crown, types.Lightbulb, [  function() {} ] ) ,
-      "Translation": new Card( "Translation", 3, types.Blue, types.Hex, types.Crown, types.Crown, types.Crown, types.Crown, [  function() {} ] ),
-      "Anatomy": new Card( "Anatomy", 4, types.Yellow, types.Leaf, types.Leaf, types.Leaf, types.Hex, types.Leaf, [  function() {} ] ) ,
-      "Colonialism": new Card( "Colonialism", 4, types.Red, types.Hex, types.Factory, types.Lightbulb, types.Factory, types.Factory, [  function() {} ] ) ,
-      "Enterprise": new Card( "Enterprise", 4, types.Purple, types.Hex, types.Crown, types.Crown, types.Crown, types.Crown, [  function() {} ] ) ,
-      "Experimentation": new Card( "Experimentation", 4, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Lightbulb, [  function() {} ] ) ,
-      "Gunpowder": new Card( "Gunpowder", 4, types.Red, types.Hex, types.Factory, types.Crown, types.Factory, types.Factory, [  function() {} ] ) ,
-      "Invention": new Card( "Invention", 4, types.Green, types.Hex, types.Lightbulb, types.Lightbulb, types.Factory, types.Lightbulb, [  function() {} ] ) ,
-      "Navigation": new Card( "Navigation", 4, types.Green, types.Hex, types.Crown, types.Crown, types.Crown, types.Crown, [  function() {} ] ) ,
-      "Perspective": new Card( "Perspective", 4, types.Yellow, types.Hex, types.Lightbulb, types.Lightbulb, types.Leaf, types.Lightbulb, [  function() {} ] ) ,
-      "Printing Press": new Card( "Printing Press", 4, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb, types.Crown, types.Lightbulb, [  function() {} ] ) ,
-      "Reformation": new Card( "Reformation", 4, types.Purple, types.Leaf, types.Leaf, types.Hex, types.Leaf, types.Leaf, [  function() {} ] ),
-      "Astronomy": new Card( "Astronomy", 5, types.Purple, types.Crown, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, [  function() {} ] ) ,
-      "Banking": new Card( "Banking", 5, types.Green, types.Factory, types.Crown, types.Hex, types.Crown, types.Crown, [  function() {} ] ) ,
-      "Chemistry": new Card( "Chemistry", 5, types.Blue, types.Factory, types.Lightbulb, types.Factory, types.Hex, types.Factory, [  function() {} ] ) ,
-      "Coal": new Card( "Coal", 5, types.Red, types.Factory, types.Factory, types.Factory, types.Hex, types.Factory, [  function() {} ] ) ,
-      "Measurement": new Card( "Measurement", 5, types.Green, types.Lightbulb, types.Leaf, types.Lightbulb, types.Hex, types.Lightbulb, [  function() {} ] ) ,
-      "Physics": new Card( "Physics", 5, types.Blue, types.Factory, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, [  function() {} ] ) ,
-      "Societies": new Card( "Societies", 5, types.Purple, types.Crown, types.Hex, types.Lightbulb, types.Crown, types.Crown, [  function() {} ] ) ,
-      "Statistics": new Card( "Statistics", 5, types.Yellow, types.Leaf, types.Lightbulb, types.Leaf, types.Hex, types.Leaf, [  function() {} ] ) ,
-      "Steam Engine": new Card( "Steam Engine", 5, types.Yellow, types.Hex, types.Factory, types.Crown, types.Factory, types.Factory, [  function() {} ] ) ,
-      "The Pirate Code": new Card( "The Pirate Code", 5, types.Red, types.Crown, types.Factory, types.Crown, types.Hex, types.Crown, [  function() {} ] ),
-      "Atomic Theory": new Card( "Atomic Theory", 6, types.Blue, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, [  function() {} ] ) ,
-      "Canning": new Card( "Canning", 6, types.Yellow, types.Hex, types.Factory, types.Leaf, types.Factory, types.Factory, [  function() {} ] ) ,
-      "Classification": new Card( "Classification", 6, types.Green, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, [  function() {} ] ) ,
-      "Democracy": new Card( "Democracy", 6, types.Purple, types.Crown, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, [  function() {} ] ) ,
-      "Emancipation": new Card( "Emancipation", 6, types.Purple, types.Factory, types.Lightbulb, types.Factory, types.Hex, types.Factory, [  function() {} ] ) ,
-      "Encyclopedia": new Card( "Encyclopedia", 6, types.Blue, types.Hex, types.Crown, types.Crown, types.Crown, types.Crown, [  function() {} ] ) ,
-      "Industrialization": new Card( "Industrialization", 6, types.Red, types.Crown, types.Factory, types.Factory, types.Hex, types.Factory, [  function() {} ] ) ,
-      "Machine Tools": new Card( "Machine Tools", 6, types.Red, types.Factory, types.Factory, types.Hex, types.Factory, types.Factory, [  function() {} ] ) ,
-      "Metric System": new Card( "Metric System", 6, types.Green, types.Hex, types.Factory, types.Crown, types.Crown, types.Crown, [  function() {} ] ) ,
-      "Vaccination": new Card( "Vaccination", 6, types.Yellow, types.Leaf, types.Factory, types.Leaf, types.Hex, types.Leaf, [  function() {} ] ),
-      "Bicycle": new Card( "Bicycle", 7, types.Green, types.Crown, types.Crown, types.Clock, types.Hex, types.Crown, [  function() {} ] ) ,
-      "Combustion": new Card( "Combustion", 7, types.Red, types.Crown, types.Crown, types.Factory, types.Hex, types.Crown, [  function() {} ] ) ,
-      "Electricity": new Card( "Electricity", 7, types.Green, types.Lightbulb, types.Factory, types.Hex, types.Factory, types.Factory, [  function() {} ] ) ,
-      "Evolution": new Card( "Evolution", 7, types.Blue, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, [  function() {} ] ) ,
-      "Explosives": new Card( "Explosives", 7, types.Red, types.Hex, types.Factory, types.Factory, types.Factory, types.Factory, [  function() {} ] ) ,
-      "Lighting": new Card( "Lighting", 7, types.Purple, types.Hex, types.Leaf, types.Clock, types.Leaf, types.Leaf, [  function() {} ] ) ,
-      "Publications": new Card( "Publications", 7, types.Blue, types.Hex, types.Lightbulb, types.Clock, types.Lightbulb, types.Lightbulb, [  function() {} ] ) ,
-      "Railroad": new Card( "Railroad", 7, types.Purple, types.Clock, types.Factory, types.Clock, types.Hex, types.Clock, [  function() {} ] ) ,
-      "Refrigeration": new Card( "Refrigeration", 7, types.Yellow, types.Hex, types.Leaf, types.Leaf, types.Crown, types.Leaf, [  function() {} ] ) ,
-      "Sanitation": new Card( "Sanitation", 7, types.Yellow, types.Leaf, types.Leaf, types.Hex, types.Leaf, types.Leaf, [  function() {} ] ),
-      "Antibiotics": new Card( "Antibiotics", 8, types.Yellow, types.Leaf, types.Leaf, types.Leaf, types.Hex, types.Leaf, [  function() {} ] ) ,
-      "Corporations": new Card( "Corporations", 8, types.Green, types.Hex, types.Factory, types.Factory, types.Crown, types.Factory, [  function() {} ] ) ,
-      "Empiricism": new Card( "Empiricism", 8, types.Purple, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, [  function() {} ] ) ,
-      "Flight": new Card( "Flight", 8, types.Red, types.Crown, types.Hex, types.Clock, types.Crown, types.Crown, [  function() {} ] ) ,
-      "Mass Media": new Card( "Mass Media", 8, types.Green, types.Lightbulb, types.Hex, types.Clock, types.Lightbulb, types.Lightbulb, [  function() {} ] ) ,
-      "Mobility": new Card( "Mobility", 8, types.Red, types.Hex, types.Factory, types.Clock, types.Factory, types.Factory, [  function() {} ] ) ,
-      "Quantum Theory": new Card( "Quantum Theory", 8, types.Blue, types.Clock, types.Clock, types.Clock, types.Hex, types.Clock, [  function() {} ] ) ,
-      "Rocketry": new Card( "Rocketry", 8, types.Blue, types.Clock, types.Clock, types.Clock, types.Hex, types.Clock, [  function() {} ] ) ,
-      "Skyscrapers": new Card( "Skyscrapers", 8, types.Yellow, types.Hex, types.Factory, types.Crown, types.Crown, types.Crown, [  function() {} ] ) ,
-      "Socialism": new Card( "Socialism", 8, types.Purple, types.Leaf, types.Hex, types.Leaf, types.Leaf, types.Leaf, [  function() {} ] ),
-      "Collaboration": new Card( "Collaboration", 9, types.Green, types.Hex, types.Crown, types.Clock, types.Crown, types.Crown, [  function() {} ] ) ,
-      "Composites": new Card( "Composites", 9, types.Red, types.Factory, types.Factory, types.Hex, types.Factory, types.Factory, [  function() {} ] ) ,
-      "Computers": new Card( "Computers", 9, types.Blue, types.Clock, types.Hex, types.Clock, types.Factory, types.Clock, [  function() {} ] ) ,
-      "Ecology": new Card( "Ecology", 9, types.Yellow, types.Leaf, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, [  function() {} ] ) ,
-      "Fission": new Card( "Fission", 9, types.Red, types.Hex, types.Clock, types.Clock, types.Clock, types.Clock, [  function() {} ] ) ,
-      "Genetics": new Card( "Genetics", 9, types.Blue, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, [  function() {} ] ) ,
-      "Satellites": new Card( "Satellites", 9, types.Green, types.Hex, types.Clock, types.Clock, types.Clock, types.Clock, [  function() {} ] ) ,
-      "Services": new Card( "Services", 9, types.Purple, types.Hex, types.Leaf, types.Leaf, types.Leaf, types.Leaf, [  function() {} ] ) ,
-      "Specialization": new Card( "Specialization", 9, types.Purple, types.Hex, types.Factory, types.Leaf, types.Factory, types.Factory, [  function() {} ] ) ,
-      "Suburbia": new Card( "Suburbia", 9, types.Yellow, types.Hex, types.Crown, types.Leaf, types.Leaf, types.Leaf, [  function() {} ] ),
-      "A.I.": new Card( "A.I.", 10, types.Purple, types.Lightbulb, types.Lightbulb, types.Clock, types.Hex, types.Clock, [  function() {} ] ) ,
-      "Bioengineering": new Card( "Bioengineering", 10, types.Blue, types.Lightbulb, types.Clock, types.Clock, types.Hex, types.Clock, [  function() {} ] ) ,
-      "Databases": new Card( "Databases", 10, types.Green, types.Hex, types.Clock, types.Clock, types.Clock, types.Clock, [  function() {} ] ) ,
-      "Globalization": new Card( "Globalization", 10, types.Yellow, types.Hex, types.Factory, types.Factory, types.Factory, types.Factory, [  function() {} ] ) ,
-      "Miniaturization": new Card( "Miniaturization", 10, types.Red, types.Hex, types.Lightbulb, types.Clock, types.Lightbulb, types.Lightbulb, [  function() {} ] ) ,
-      "Robotics": new Card( "Robotics", 10, types.Red, types.Hex, types.Factory, types.Clock, types.Factory, types.Factory, [  function() {} ] ) ,
-      "Self Service": new Card( "Self Service", 10, types.Green, types.Hex, types.Crown, types.Crown, types.Crown, types.Crown, [  function() {} ] ) ,
-      "Software": new Card( "Software", 10, types.Blue, types.Clock, types.Clock, types.Clock, types.Hex, types.Clock, [  function() {} ] ) ,
-      "Stem Cells": new Card( "Stem Cells", 10, types.Yellow, types.Hex, types.Leaf, types.Leaf, types.Leaf, types.Leaf, [  function() {} ] ) ,
-      "The Internet": new Card( "The Internet", 10, types.Purple, types.Hex, types.Clock, types.Clock, types.Lightbulb, types.Clock, [  function() {} ] )
+      "Monotheism": new Card( "Monotheism", 2, types.Purple, types.Hex, types.Castle, types.Castle, types.Castle, types.Castle, monotheismDogmas ),
+      "Philosophy": new Card( "Philosophy", 2, types.Purple, types.Hex, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Lightbulb, philosophyDogmas ),
+      "Road Building": new Card( "Road Building", 2, types.Red, types.Castle, types.Castle, types.Hex, types.Castle, types.Castle, roadBulidingDogmas ),
+      "Alchemy": new Card( "Alchemy", 3, types.Blue, types.Hex, types.Leaf, types.Castle, types.Castle, types.Castle, alchemyDogmas ),
+      "Compass": new Card( "Compass", 3, types.Green, types.Hex, types.Crown, types.Crown, types.Leaf, types.Crown, compassDogmas ),
+      "Education": new Card( "Education", 3, types.Purple, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, educationDogmas ),
+      "Engineering": new Card( "Engineering", 3, types.Red, types.Castle, types.Hex, types.Lightbulb, types.Castle, types.Castle, engineeringDogmas ),
+      "Feudalism": new Card( "Feudalism", 3, types.Purple, types.Hex, types.Castle, types.Leaf, types.Castle, types.Castle, feudalismDogmas ),
+      "Machinery": new Card( "Machinery", 3, types.Yellow, types.Leaf, types.Leaf, types.Hex, types.Castle, types.Leaf, machineryDogmas ),
+      "Medicine": new Card( "Medicine", 3, types.Yellow, types.Crown, types.Leaf, types.Leaf, types.Hex, types.Leaf, medicineDogmas ),
+      "Optics": new Card( "Optics", 3, types.Red, types.Crown, types.Crown, types.Crown, types.Hex, types.Crown, opticsDogmas ),
+      "Paper": new Card( "Paper", 3, types.Green, types.Hex, types.Lightbulb, types.Lightbulb, types.Crown, types.Lightbulb, paperDogmas ),
+      "Translation": new Card( "Translation", 3, types.Blue, types.Hex, types.Crown, types.Crown, types.Crown, types.Crown, translationDogmas ),
+      "Anatomy": new Card( "Anatomy", 4, types.Yellow, types.Leaf, types.Leaf, types.Leaf, types.Hex, types.Leaf, anatomyDogmas ),
+      "Colonialism": new Card( "Colonialism", 4, types.Red, types.Hex, types.Factory, types.Lightbulb, types.Factory, types.Factory, colonialismDogmas ),
+      "Enterprise": new Card( "Enterprise", 4, types.Purple, types.Hex, types.Crown, types.Crown, types.Crown, types.Crown, enterpriseDogmas ),
+      "Experimentation": new Card( "Experimentation", 4, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Lightbulb, experimentationDogmas ),
+      "Gunpowder": new Card( "Gunpowder", 4, types.Red, types.Hex, types.Factory, types.Crown, types.Factory, types.Factory, gunpowderDogmas ),
+      "Invention": new Card( "Invention", 4, types.Green, types.Hex, types.Lightbulb, types.Lightbulb, types.Factory, types.Lightbulb, inventionDogmas ),
+      "Navigation": new Card( "Navigation", 4, types.Green, types.Hex, types.Crown, types.Crown, types.Crown, types.Crown, navigationDogmas ),
+      "Perspective": new Card( "Perspective", 4, types.Yellow, types.Hex, types.Lightbulb, types.Lightbulb, types.Leaf, types.Lightbulb, perspectiveDogmas ),
+      "Printing Press": new Card( "Printing Press", 4, types.Blue, types.Hex, types.Lightbulb, types.Lightbulb, types.Crown, types.Lightbulb, printingPressDogmas ),
+      "Reformation": new Card( "Reformation", 4, types.Purple, types.Leaf, types.Leaf, types.Hex, types.Leaf, types.Leaf, reformationDogmas ),
+      "Astronomy": new Card( "Astronomy", 5, types.Purple, types.Crown, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, astronomyDogmas ),
+      "Banking": new Card( "Banking", 5, types.Green, types.Factory, types.Crown, types.Hex, types.Crown, types.Crown, bankingDogmas ),
+      "Chemistry": new Card( "Chemistry", 5, types.Blue, types.Factory, types.Lightbulb, types.Factory, types.Hex, types.Factory, chemistryDogmas ),
+      "Coal": new Card( "Coal", 5, types.Red, types.Factory, types.Factory, types.Factory, types.Hex, types.Factory, coalDogmas ),
+      "Measurement": new Card( "Measurement", 5, types.Green, types.Lightbulb, types.Leaf, types.Lightbulb, types.Hex, types.Lightbulb, measurementDogmas ),
+      "Physics": new Card( "Physics", 5, types.Blue, types.Factory, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, physicsDogmas ),
+      "Societies": new Card( "Societies", 5, types.Purple, types.Crown, types.Hex, types.Lightbulb, types.Crown, types.Crown, societiesDogmas ),
+      "Statistics": new Card( "Statistics", 5, types.Yellow, types.Leaf, types.Lightbulb, types.Leaf, types.Hex, types.Leaf, statisticsDogmas ),
+      "Steam Engine": new Card( "Steam Engine", 5, types.Yellow, types.Hex, types.Factory, types.Crown, types.Factory, types.Factory, steamEngineDogmas ),
+      "The Pirate Code": new Card( "The Pirate Code", 5, types.Red, types.Crown, types.Factory, types.Crown, types.Hex, types.Crown, thePirateCodeDogmas ),
+      "Atomic Theory": new Card( "Atomic Theory", 6, types.Blue, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, atomicTheoryDogmas ),
+      "Canning": new Card( "Canning", 6, types.Yellow, types.Hex, types.Factory, types.Leaf, types.Factory, types.Factory, canningDogmas ),
+      "Classification": new Card( "Classification", 6, types.Green, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, classificationDogmas ),
+      "Democracy": new Card( "Democracy", 6, types.Purple, types.Crown, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, democracyDogmas ),
+      "Emancipation": new Card( "Emancipation", 6, types.Purple, types.Factory, types.Lightbulb, types.Factory, types.Hex, types.Factory, emancipationDogmas ),
+      "Encyclopedia": new Card( "Encyclopedia", 6, types.Blue, types.Hex, types.Crown, types.Crown, types.Crown, types.Crown, encyclopediaDogmas ),
+      "Industrialization": new Card( "Industrialization", 6, types.Red, types.Crown, types.Factory, types.Factory, types.Hex, types.Factory, industrializationDogmas ),
+      "Machine Tools": new Card( "Machine Tools", 6, types.Red, types.Factory, types.Factory, types.Hex, types.Factory, types.Factory, machineToolsDogmas ),
+      "Metric System": new Card( "Metric System", 6, types.Green, types.Hex, types.Factory, types.Crown, types.Crown, types.Crown, metricSystemDogmas ),
+      "Vaccination": new Card( "Vaccination", 6, types.Yellow, types.Leaf, types.Factory, types.Leaf, types.Hex, types.Leaf, vaccinationDogmas ),
+      "Bicycle": new Card( "Bicycle", 7, types.Green, types.Crown, types.Crown, types.Clock, types.Hex, types.Crown, bicycleDogmas ),
+      "Combustion": new Card( "Combustion", 7, types.Red, types.Crown, types.Crown, types.Factory, types.Hex, types.Crown, combustionDogmas ),
+      "Electricity": new Card( "Electricity", 7, types.Green, types.Lightbulb, types.Factory, types.Hex, types.Factory, types.Factory, electricityDogmas ),
+      "Evolution": new Card( "Evolution", 7, types.Blue, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, evolutionDogmas ),
+      "Explosives": new Card( "Explosives", 7, types.Red, types.Hex, types.Factory, types.Factory, types.Factory, types.Factory, explosivesDogmas ),
+      "Lighting": new Card( "Lighting", 7, types.Purple, types.Hex, types.Leaf, types.Clock, types.Leaf, types.Leaf, lightingDogmas ),
+      "Publications": new Card( "Publications", 7, types.Blue, types.Hex, types.Lightbulb, types.Clock, types.Lightbulb, types.Lightbulb, publicationsDogmas ),
+      "Railroad": new Card( "Railroad", 7, types.Purple, types.Clock, types.Factory, types.Clock, types.Hex, types.Clock, railroadDogmas ),
+      "Refrigeration": new Card( "Refrigeration", 7, types.Yellow, types.Hex, types.Leaf, types.Leaf, types.Crown, types.Leaf, refrigerationDogmas ),
+      "Sanitation": new Card( "Sanitation", 7, types.Yellow, types.Leaf, types.Leaf, types.Hex, types.Leaf, types.Leaf, sanitationDogmas ),
+      "Antibiotics": new Card( "Antibiotics", 8, types.Yellow, types.Leaf, types.Leaf, types.Leaf, types.Hex, types.Leaf, antibioticsDogmas ),
+      "Corporations": new Card( "Corporations", 8, types.Green, types.Hex, types.Factory, types.Factory, types.Crown, types.Factory, corporationsDogmas ),
+      "Empiricism": new Card( "Empiricism", 8, types.Purple, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, empiricismDogmas ),
+      "Flight": new Card( "Flight", 8, types.Red, types.Crown, types.Hex, types.Clock, types.Crown, types.Crown, flightDogmas ),
+      "Mass Media": new Card( "Mass Media", 8, types.Green, types.Lightbulb, types.Hex, types.Clock, types.Lightbulb, types.Lightbulb, massMediaDogmas ),
+      "Mobility": new Card( "Mobility", 8, types.Red, types.Hex, types.Factory, types.Clock, types.Factory, types.Factory, mobilityDogmas ),
+      "Quantum Theory": new Card( "Quantum Theory", 8, types.Blue, types.Clock, types.Clock, types.Clock, types.Hex, types.Clock, quantumTheoryDogmas ),
+      "Rocketry": new Card( "Rocketry", 8, types.Blue, types.Clock, types.Clock, types.Clock, types.Hex, types.Clock, rocketryDogmas ),
+      "Skyscrapers": new Card( "Skyscrapers", 8, types.Yellow, types.Hex, types.Factory, types.Crown, types.Crown, types.Crown, skyscrapersDogmas ),
+      "Socialism": new Card( "Socialism", 8, types.Purple, types.Leaf, types.Hex, types.Leaf, types.Leaf, types.Leaf, socialismDogmas ),
+      "Collaboration": new Card( "Collaboration", 9, types.Green, types.Hex, types.Crown, types.Clock, types.Crown, types.Crown, collaborationDogmas ),
+      "Composites": new Card( "Composites", 9, types.Red, types.Factory, types.Factory, types.Hex, types.Factory, types.Factory, compositesDogmas ),
+      "Computers": new Card( "Computers", 9, types.Blue, types.Clock, types.Hex, types.Clock, types.Factory, types.Clock, computersDogmas ),
+      "Ecology": new Card( "Ecology", 9, types.Yellow, types.Leaf, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, ecologyDogmas ),
+      "Fission": new Card( "Fission", 9, types.Red, types.Hex, types.Clock, types.Clock, types.Clock, types.Clock, fissionDogmas ),
+      "Genetics": new Card( "Genetics", 9, types.Blue, types.Lightbulb, types.Lightbulb, types.Lightbulb, types.Hex, types.Lightbulb, geneticsDogmas ),
+      "Satellites": new Card( "Satellites", 9, types.Green, types.Hex, types.Clock, types.Clock, types.Clock, types.Clock, satellitesDogmas ),
+      "Services": new Card( "Services", 9, types.Purple, types.Hex, types.Leaf, types.Leaf, types.Leaf, types.Leaf, servicesDogmas ),
+      "Specialization": new Card( "Specialization", 9, types.Purple, types.Hex, types.Factory, types.Leaf, types.Factory, types.Factory, specializationDogmas ),
+      "Suburbia": new Card( "Suburbia", 9, types.Yellow, types.Hex, types.Crown, types.Leaf, types.Leaf, types.Leaf, suburbiaDogmas ),
+      "A.I.": new Card( "A.I.", 10, types.Purple, types.Lightbulb, types.Lightbulb, types.Clock, types.Hex, types.Clock, aiDogmas ),
+      "Bioengineering": new Card( "Bioengineering", 10, types.Blue, types.Lightbulb, types.Clock, types.Clock, types.Hex, types.Clock, bioengineeringDogmas ),
+      "Databases": new Card( "Databases", 10, types.Green, types.Hex, types.Clock, types.Clock, types.Clock, types.Clock, databasesDogmas ),
+      "Globalization": new Card( "Globalization", 10, types.Yellow, types.Hex, types.Factory, types.Factory, types.Factory, types.Factory, globalizationDogmas ),
+      "Miniaturization": new Card( "Miniaturization", 10, types.Red, types.Hex, types.Lightbulb, types.Clock, types.Lightbulb, types.Lightbulb, miniaturizationDogmas ),
+      "Robotics": new Card( "Robotics", 10, types.Red, types.Hex, types.Factory, types.Clock, types.Factory, types.Factory, roboticsDogmas ),
+      "Self Service": new Card( "Self Service", 10, types.Green, types.Hex, types.Crown, types.Crown, types.Crown, types.Crown, selfServiceDogmas ),
+      "Software": new Card( "Software", 10, types.Blue, types.Clock, types.Clock, types.Clock, types.Hex, types.Clock, softwareDogmas ),
+      "Stem Cells": new Card( "Stem Cells", 10, types.Yellow, types.Hex, types.Leaf, types.Leaf, types.Leaf, types.Leaf, stemCellsDogmas ),
+      "The Internet": new Card( "The Internet", 10, types.Purple, types.Hex, types.Clock, types.Clock, types.Lightbulb, types.Clock, theInternetDogmas )
 }
 exports.Cards = cards;
