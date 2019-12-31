@@ -5,25 +5,25 @@ Before starting development, run `npm install` to install module dependencies.
 Tests are written using [Mocha] and the test suite can be ran with `npm test`
 while in the Innova directory.
 
-- server.js:
+- `server.js`:
    Innova uses a c-style struct protocol over TCP for easy compatibility with 
    different client-side front end implementations. Check out the 
    [currently non-existant documentation] for more detail.   
 
-- engine.js:
+- `engine.js`:
    Core game file defining objects for maintaining game state.  
 
-- cards.js:
+- `cards.js`:
    I wrote a simple parser to generate this from [the innovation card list].
    Callback functions are used to represent dogma effects of each card.
 
-- types.js:
+- `types.js`:
    This file contains objects and "types" that need to be used in multiple files.
    Since Javascript is very loosely typed, I use the enum definitions in this file
    to act as stand-ins. InvalidMove and VictoryCondition are exceptions. Reaction is
     used to indicate player input is required.
 
-##Dogmas
+## Dogmas
 There are 105 unique cards in the game.  A large chunk of the work with this project is 
 writing each card's dogma effects.  Clarification about how dogma effects work in Innova
 is provided here so any developer may contribute.
@@ -34,7 +34,7 @@ that card.  Each element provides an execute function to perform the work of the
 by changing the game's state.  Execute functions are called sequentially for each
 element in the list.  Elements in the list are of different forms depending on the type
 of the dogma effect.
-####Demand Dogma
+#### Demand Dogma
 ```javascript
 { 
    demand: true,
@@ -44,7 +44,7 @@ of the dogma effect.
 - caller is the player that activated that card's dogmas
 - callee is the player currently being effected
 
-####Non-demand Dogma
+#### Non-demand Dogma
 ```javascript
 {
    demand: false,
@@ -60,7 +60,7 @@ of the dogma effect.
 - The execute function returns true if the game state has changed to keep track of
  an extra draw if this dogma effect is being shared.
 
-###Sharing State
+### Sharing State
 Some cards must maintain state between individual dogma effects.  This is
 accomplished by using a factory function to create the list of dogmas for a card.
 This way, the execute function can be used as a closure.
@@ -72,12 +72,12 @@ var AgricultureDogmas = function() {
 }
 ```
 
-###Player Decisions
+### Player Decisions
 Some cards have optional dogmas ( **you may** ... ) or allow the player to make a
 decision.  This is accomplished by setting the reaction field of the player to a 
 Reaction object.  
 
-####Reaction
+#### Reaction
 ```javascript
 {
    n: int
